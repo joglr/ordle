@@ -1,0 +1,44 @@
+:root {
+  --u: 1em;
+
+  --black: hsl(0, 0%, 0%);
+  --green: rgb(76, 175, 76);
+  --yellow: rgb(202, 202, 86);
+
+  --wordSize: 5;
+  --attempts: 6;
+
+  --primary: #d8d8d8;
+  --secondary: #a1a1a1;
+  --text: hsl(0, 0%, 0%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #111111;
+    --secondary: #383838;
+    --text: #bdbdbd;
+  }
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+body {
+  background-color: var(--primary);
+  color: var(--text);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
