@@ -69,18 +69,18 @@ export function writeToSquare(
   return s;
 }
 
-export const writeLetter: (l: string, os: OrdleState) => OrdleState = (
+export async function writeLetter(
   l: string,
   os: OrdleState
-) => {
+): Promise<OrdleState> {
   const { history, currentAttempt, keyboardColors } = clone(os);
   if (history.length < HISTORY_SIZE && currentAttempt.length < WORD_SIZE) {
     currentAttempt.push(l);
   }
   return { history, currentAttempt, keyboardColors };
-};
+}
 
-export function deleteLetter(os: OrdleState) {
+export async function deleteLetter(os: OrdleState): Promise<OrdleState> {
   const { history, currentAttempt, keyboardColors } = clone(os);
   if (currentAttempt.length === 0) return os;
 
@@ -91,7 +91,7 @@ export function deleteLetter(os: OrdleState) {
   };
 }
 
-export async function guess(s: OrdleState) {
+export async function guess(s: OrdleState): Promise<OrdleState> {
   const url = new URL("/api/guess", window.location.href);
 
   const response = await fetch(url.toString(), {

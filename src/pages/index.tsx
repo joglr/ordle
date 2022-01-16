@@ -3,7 +3,9 @@ import Head from "next/head";
 import { createContext, Dispatch, SetStateAction, useContext } from "react";
 import { useState } from "react";
 import {
+  deleteLetter,
   DF,
+  guess,
   HISTORY_SIZE,
   LetterState,
   OrdleState,
@@ -23,6 +25,22 @@ const keyboard = [
   "ASDFGHJKLÆØ".split(""),
   ["Enter", ..."ZXCVBNM".split(""), "Delete"],
 ];
+
+function callKeyboardButtonHandler(
+  key: string,
+  os: OrdleState
+): Promise<OrdleState> {
+  switch (key) {
+    case "Enter":
+      if (os.currentAttempt.length === WORD_SIZE) {
+        return guess(os);
+      } else return Promise.resolve(os);
+    case "Delete":
+      return deleteLetter(os);
+    default:
+      return writeLetter(key, os);
+  }
+}
 
 function getClassNameFromLetterEntryState(state: LetterState) {
   switch (state) {
@@ -107,31 +125,28 @@ function Display() {
 
   return (
     <div className={styles.display}>
-      {ordleState.history.map(
-        (row, i) =>
-          // <>
-          //   {
-          row.map((letter, j) => (
+      {ordleState.history.map((row, i) => (
+        <>
+          {row.map((letter, j) => (
             <Square
               key={`${JSON.stringify(letter)}-${i}-${j}`}
               className={getClassNameFromLetterEntryState(letter.state)}
             >
               {letter.letter}
             </Square>
-          ))
-        //   }
-        // </>
-      )}
-      {attemptsRemainingSquares}
+          ))}
+        </>
+      ))}
       {ordleState.currentAttempt.map((letter, i) => (
         <Square
           key={`${letter}-${i}`}
           className={getClassNameFromLetterEntryState(LetterState.DEFAULT)}
         >
-          {letter.letter}
+          {letter}
         </Square>
       ))}
       {currentAttemptRemainingSquares}
+      {attemptsRemainingSquares}
     </div>
   );
 }
@@ -172,7 +187,10 @@ function KeyboardRow(props: { row: string[] }) {
           className=""
           // TODO: Map of best key state
           // className={getClassNameFromLetterEntryState()}
-          onClick={() => setOrdleState(writeLetter(key, ordleState))}
+          onClick={async () => {
+            const value = await callKeyboardButtonHandler(key, ordleState);
+            setOrdleState(value);
+          }}
         />
       ))}
     </div>
