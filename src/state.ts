@@ -81,12 +81,13 @@ export const writeLetter: (l: string, os: OrdleState) => OrdleState = (
 };
 
 export function deleteLetter(os: OrdleState) {
-  if (os.currentAttempt.length === 0) return os;
+  const { history, currentAttempt, keyboardColors } = clone(os);
+  if (currentAttempt.length === 0) return os;
 
-  const [_, ...rest] = os.currentAttempt.slice().reverse();
   return {
-    history: os.history,
-    currentAttempt: rest,
+    history: history,
+    currentAttempt: currentAttempt.slice(0, -1),
+    keyboardColors,
   };
 }
 

@@ -89,6 +89,9 @@ describe("deleteLetter", () => {
     expect(newState.currentAttempt.length).toBe(
       state.currentAttempt.length - 1
     );
+    expect(newState.currentAttempt).toStrictEqual(
+      state.currentAttempt.slice(0, -1)
+    );
   });
 
   it("does not affect an empty attempt", () => {
