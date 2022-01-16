@@ -9,7 +9,6 @@ export enum LetterState {
 
 export interface HistoryLetter {
   letter: string;
-  keyboardColors: Record<string, string>;
   state: LetterState;
 }
 // Word State Entry
@@ -27,6 +26,7 @@ export type History = HistoryEntry[];
 export type OrdleState = {
   history: History;
   currentAttempt: string[];
+  keyboardColors: Record<string, string>;
 };
 
 export const WORD_SIZE = 5;
@@ -69,12 +69,15 @@ export function writeToSquare(
   return s;
 }
 
-export const writeLetter = (l: string, os: OrdleState) => {
-  const { history, currentAttempt } = clone(os);
+export const writeLetter: (l: string, os: OrdleState) => OrdleState = (
+  l: string,
+  os: OrdleState
+) => {
+  const { history, currentAttempt, keyboardColors } = clone(os);
   if (history.length < HISTORY_SIZE && currentAttempt.length < WORD_SIZE) {
-    currentAttempt.push(L(l, LetterState.DEFAULT));
+    currentAttempt.push(l);
   }
-  return { history, currentAttempt };
+  return { history, currentAttempt, keyboardColors };
 };
 
 export function deleteLetter(os: OrdleState) {

@@ -2,7 +2,14 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { createContext, Dispatch, SetStateAction, useContext } from "react";
 import { useState } from "react";
-import { DF, HISTORY_SIZE, LetterState, OrdleState, WORD_SIZE } from "../state";
+import {
+  DF,
+  HISTORY_SIZE,
+  LetterState,
+  OrdleState,
+  WORD_SIZE,
+  writeLetter,
+} from "../state";
 import styles from "../styles/Home.module.css";
 
 // for (let i = 3250; i < 3254; i++) {
@@ -78,9 +85,10 @@ function App() {
 function Display() {
   const [ordleState, setOrdleState] = useOrdleContext();
   const attemptsRemaining =
-    (HISTORY_SIZE - ordleState.history.length) * WORD_SIZE;
-
+    (HISTORY_SIZE - ordleState.history.length - 1) * WORD_SIZE;
+  const currentLettersRemaining = WORD_SIZE - ordleState.currentAttempt.length;
   const attemptsRemainingSquares = [];
+  const currentAttemptRemainingSquares = [];
   for (let i = 0; i < attemptsRemaining; i++) {
     attemptsRemainingSquares.push(
       <Square className={getClassNameFromLetterEntryState(LetterState.DEFAULT)}>
@@ -89,22 +97,41 @@ function Display() {
     );
   }
 
+  for (let i = 0; i < currentLettersRemaining; i++) {
+    currentAttemptRemainingSquares.push(
+      <Square className={getClassNameFromLetterEntryState(LetterState.DEFAULT)}>
+        {" "}
+      </Square>
+    );
+  }
+
   return (
     <div className={styles.display}>
-      {ordleState.history.map((row, i) => (
-        <>
-          {row.map((letter, j) => (
-            <>
-              <Square
-                // key={JSON.stringify(letter)}
-                className={getClassNameFromLetterEntryState(letter.state)}
-              >
-                {letter.letter}
-              </Square>
-            </>
-          ))}
-        </>
+      {ordleState.history.map(
+        (row, i) =>
+          // <>
+          //   {
+          row.map((letter, j) => (
+            <Square
+              key={`${JSON.stringify(letter)}-${i}-${j}`}
+              className={getClassNameFromLetterEntryState(letter.state)}
+            >
+              {letter.letter}
+            </Square>
+          ))
+        //   }
+        // </>
+      )}
+      {attemptsRemainingSquares}
+      {ordleState.currentAttempt.map((letter, i) => (
+        <Square
+          key={`${letter}-${i}`}
+          className={getClassNameFromLetterEntryState(LetterState.DEFAULT)}
+        >
+          {letter.letter}
+        </Square>
       ))}
+      {currentAttemptRemainingSquares}
     </div>
   );
 }
@@ -135,14 +162,17 @@ function Keyboard() {
 }
 
 function KeyboardRow(props: { row: string[] }) {
+  const [ordleState, setOrdleState] = useOrdleContext();
   return (
     <div className={styles.keyrow}>
       {props.row.map((key, index) => (
         <KeyboardButton
           key={index}
           text={key}
-          className={getClassNameFromLetterEntryState()}
-          onClick={() => {}}
+          className=""
+          // TODO: Map of best key state
+          // className={getClassNameFromLetterEntryState()}
+          onClick={() => setOrdleState(writeLetter(key, ordleState))}
         />
       ))}
     </div>

@@ -38,6 +38,7 @@ function mkState(
   return {
     history,
     currentAttempt,
+    keyboardColors: {},
   };
 }
 
@@ -46,7 +47,7 @@ describe("writeToSquare", () => {
     const state = mkState();
     const newState = writeLetter("a", state);
 
-    const expectedAttemptState = [...state.currentAttempt, DF("a")];
+    const expectedAttemptState = [...state.currentAttempt, "a"];
     expect(newState.currentAttempt.length).toBe(expectedAttemptState.length);
     expect(newState.currentAttempt).toStrictEqual(expectedAttemptState);
   });
@@ -54,7 +55,7 @@ describe("writeToSquare", () => {
   it("allows writing if the history is almost full", () => {
     const state = mkState(almostFullHistory);
     const newState = writeLetter("a", state);
-    const expectedAttemptState = [...state.currentAttempt, DF("a")];
+    const expectedAttemptState = [...state.currentAttempt, "a"];
     expect(newState.currentAttempt.length).toBe(expectedAttemptState.length);
     expect(newState.currentAttempt).toStrictEqual(expectedAttemptState);
   });
@@ -62,7 +63,7 @@ describe("writeToSquare", () => {
   it("allow writing if attempt is almost full", () => {
     const state = mkState(almostFullHistory, almostFullAttempt);
     const newState = writeLetter("a", state);
-    const expectedAttemptState = [...state.currentAttempt, DF("a")];
+    const expectedAttemptState = [...state.currentAttempt, "a"];
     expect(newState.currentAttempt.length).toBe(expectedAttemptState.length);
     expect(newState.currentAttempt).toStrictEqual(expectedAttemptState);
   });
