@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { createContext, Dispatch, SetStateAction, useContext } from "react";
 import { useState } from "react";
+import { ToastProvider, useToasts } from "react-toast-notifications";
 import {
   deleteLetter,
   DF,
@@ -13,40 +14,19 @@ import {
   writeLetter,
 } from "../state";
 import styles from "../styles/Home.module.css";
-
-// for (let i = 3250; i < 3254; i++) {
-//   const time = i * ONE_DAY_IN_MS;
-//   const index = getWordIndexFromTimeMS(NOW_MS + time);
-//   console.log(WORDS[index]);
-// }
+import { isLast } from "../util";
 
 const keyboard = [
   "QWERTYUIOPÅ".split(""),
   "ASDFGHJKLÆØ".split(""),
-  ["Enter", ..."ZXCVBNM".split(""), "Delete"],
+  "ZXCVBNM".split(""),
 ];
-
-function callKeyboardButtonHandler(
-  key: string,
-  os: OrdleState
-): Promise<OrdleState> {
-  switch (key) {
-    case "Enter":
-      if (os.currentAttempt.length === WORD_SIZE) {
-        return guess(os);
-      } else return Promise.resolve(os);
-    case "Delete":
-      return deleteLetter(os);
-    default:
-      return writeLetter(key, os);
-  }
-}
 
 function getClassNameFromLetterEntryState(state: LetterState) {
   switch (state) {
     case LetterState.CORRECT:
       return styles.correct;
-    case LetterState.CORRECT_SPOT:
+    case LetterState.CORRECT_LETTER:
       return styles.correctSpot;
     case LetterState.INCORRECT:
       return styles.incorrect;
@@ -65,7 +45,7 @@ function useOrdleContext() {
 
 const Home: NextPage = () => {
   return (
-    <>
+    <ToastProvider>
       <Head>
         <title>Ordle</title>
         <meta
@@ -75,7 +55,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <App />
-    </>
+    </ToastProvider>
   );
 };
 
@@ -171,16 +151,28 @@ function Keyboard() {
   return (
     <div className={styles.keyboard}>
       {keyboard.map((row, index) => (
-        <KeyboardRow key={index} row={row} />
+        <KeyboardRow key={index} row={row} final={isLast(keyboard, index)} />
       ))}
     </div>
   );
 }
 
-function KeyboardRow(props: { row: string[] }) {
+function KeyboardRow(props: { row: string[]; final?: boolean }) {
+  const { addToast } = useToasts();
   const [ordleState, setOrdleState] = useOrdleContext();
+
+  async function enterHandler() {
+    // TODO: Block more submissions while waiting judgement
+    const { state, error } = await guess(ordleState);
+    if (error && state === null)
+      addToast(error, { appearance: "error", autoDismiss: true });
+    if (error === null) setOrdleState(state);
+  }
   return (
     <div className={styles.keyrow}>
+      {props.final ? (
+        <KeyboardButton text="Enter" onClick={enterHandler} className="" />
+      ) : null}
       {props.row.map((key, index) => (
         <KeyboardButton
           key={index}
@@ -188,12 +180,16 @@ function KeyboardRow(props: { row: string[] }) {
           className=""
           // TODO: Map of best key state
           // className={getClassNameFromLetterEntryState()}
-          onClick={async () => {
-            const value = await callKeyboardButtonHandler(key, ordleState);
-            setOrdleState(value);
-          }}
+          onClick={() => setOrdleState(writeLetter(key, ordleState))}
         />
       ))}
+      {props.final ? (
+        <KeyboardButton
+          text="Delete"
+          onClick={() => setOrdleState(deleteLetter(ordleState))}
+          className=""
+        />
+      ) : null}
     </div>
   );
 }
