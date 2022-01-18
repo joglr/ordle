@@ -58,7 +58,8 @@
   "lint-staged": {
     "**/*.ts": [
       "eslint --cache --fix",
-      "tsc-files --noEmit"
+      "tsc-files --noEmit",
+      "jest --bail --findRelatedTests"
     ],
     "**/*.{ts,js,css,md}": "prettier --write"
   }
