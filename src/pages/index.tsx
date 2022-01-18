@@ -82,7 +82,7 @@ function App() {
 }
 
 function Display() {
-  const [ordleState, setOrdleState] = useOrdleContext();
+  const [ordleState] = useOrdleContext();
   const attemptsRemaining =
     (HISTORY_SIZE - ordleState.history.length - 1) * WORD_SIZE;
   const currentLettersRemaining = WORD_SIZE - ordleState.currentAttempt.length;
@@ -166,7 +166,7 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
     const { state, error } = await guess(ordleState);
     if (error && state === null)
       addToast(error, { appearance: "error", autoDismiss: true });
-    if (error === null) setOrdleState(state);
+    if (error === null && state !== null) setOrdleState(state);
   }
   return (
     <div className={styles.keyrow}>
