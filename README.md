@@ -1,3 +1,5 @@
+# Ordle &bullet; [![codecov](https://codecov.io/gh/joglr/ordle/branch/main/graph/badge.svg?token=23D51WC82B)](https://codecov.io/gh/joglr/ordle)
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
