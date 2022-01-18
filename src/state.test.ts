@@ -1,5 +1,7 @@
 import {
   C,
+  CL,
+  colorize,
   deleteLetter,
   DF,
   guess,
@@ -102,6 +104,46 @@ describe("deleteLetter", () => {
   });
 });
 
-describe("guess", () => {
-  // it("");
+describe("colorize", () => {
+  it("increases history by one", () => {
+    const state = mkState([], ["a", "b", "c", "d", "e"]);
+    const newState = colorize(state, "abcde");
+    expect(newState.history.length).toBe(1);
+  });
+
+  it("colorizses green if correct", () => {
+    const state = mkState([], ["a", "b", "c", "d", "e"]);
+    const newState = colorize(state, "abcde");
+    for (const letter of newState.history[0]) {
+      expect(letter).toStrictEqual(C(letter.letter));
+    }
+  });
+
+  it("only colorize the first match if multiple", () => {
+    const state = mkState([], "faaaa".split(""));
+    const newState = colorize(state, "abcde");
+
+    const [a, b, c, d, e] = newState.history[0];
+
+    expect(a).toStrictEqual(DF("f"));
+    expect(b).toStrictEqual(CL("a"));
+    expect(c).toStrictEqual(DF("a"));
+    expect(d).toStrictEqual(DF("a"));
+    expect(e).toStrictEqual(DF("a"));
+  });
+
+  it("only colorize the first match if multiple", () => {
+    const state = mkState([], "faaaa".split(""));
+    const newState = colorize(state, "aacde");
+
+    const [a, b, c, d, e] = newState.history[0];
+
+    expect(a).toStrictEqual(DF("f"));
+    expect(b).toStrictEqual(C("a"));
+    expect(c).toStrictEqual(CL("a"));
+    expect(d).toStrictEqual(DF("a"));
+    expect(e).toStrictEqual(DF("a"));
+  });
+
+  it.todo("updates keyboard colors");
 });

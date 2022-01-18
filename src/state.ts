@@ -1,10 +1,12 @@
 import { clone } from "./util";
 
+const errors = {};
+
 export enum LetterState {
-  DEFAULT,
-  INCORRECT,
-  CORRECT,
-  CORRECT_SPOT,
+  DEFAULT = "DEFAULT",
+  INCORRECT = "INCORRECT",
+  CORRECT = "CORRECT",
+  CORRECT_LETTER = "CORRECT_LETTER",
 }
 
 export interface HistoryLetter {
@@ -33,26 +35,17 @@ export const WORD_SIZE = 5;
 export const HISTORY_SIZE = 6;
 export const L = (l: string, s: LetterState) => ({ letter: l, state: s });
 
-export const DF = (l: string) => ({
-  letter: l,
-  state: LetterState.DEFAULT,
-});
+export const DF = (l: string) => L(l, LetterState.DEFAULT);
 
-export const C = (l: string) => ({
-  letter: l,
-  state: LetterState.CORRECT,
-});
+export const C = (l: string) => L(l, LetterState.CORRECT);
 
-export const CS = (l: string) => ({
-  letter: l,
-  state: LetterState.CORRECT_SPOT,
-});
+export const CL = (l: string) => L(l, LetterState.CORRECT_LETTER);
 
 export function getColorFromLetterEntryState(styles: any, state: LetterState) {
   switch (state) {
     case LetterState.CORRECT:
       return styles.correct;
-    case LetterState.CORRECT_SPOT:
+    case LetterState.CORRECT_LETTER:
       return styles.correctSpot;
     default:
       return "";
@@ -101,5 +94,37 @@ export async function guess(s: OrdleState): Promise<OrdleState> {
       "Content-Type": "application/json",
     },
   });
-  return await response.json();
+  const data = await response.json();
+  if (response.status !== 200) {
+    throw new Error(data.error);
+  }
+  return data;
+}
+
+export function colorize(os: OrdleState, todaysWord: string): OrdleState {
+  const { history, currentAttempt, keyboardColors } = clone(os);
+  const todaysLetters = todaysWord.split("") as (string | null)[];
+  const historyEntry: HistoryEntry = [DF(""), DF(""), DF(""), DF(""), DF("")];
+  for (let i = 0; i < currentAttempt.length; i++) {
+    const letter = currentAttempt[i];
+    const todaysLetter = todaysLetters[i];
+    let value: HistoryLetter;
+    if (letter === todaysLetter) {
+      todaysLetters[i] = null;
+      value = C(letter);
+    } else if (todaysLetters.includes(letter)) {
+      const index = todaysLetters.indexOf(letter);
+      todaysLetters[index] = null;
+      value = CL(letter);
+    } else {
+      value = L(letter, LetterState.DEFAULT);
+    }
+    historyEntry[i] = value;
+    // TODO: Update keyboardColors
+  }
+  return {
+    currentAttempt: [],
+    keyboardColors,
+    history: [...history, historyEntry],
+  };
 }
