@@ -83,6 +83,7 @@ function createEmptyState(): OrdleState {
   return {
     history: [],
     currentAttempt: [],
+    keyboardColors: {},
   };
 }
 
