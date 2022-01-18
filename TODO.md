@@ -27,3 +27,11 @@ export function getStaticProps() {
 - [ ] Implement typing animation
 - [ ] Implement keyboard input
 - [ ] Implement help menu
+
+## Data
+
+- [ ] Handle words with multiple meanings (e.g. 1. skole, 2. skole)
+
+## Bugs:
+
+- [ ] Kan ikke skrive i det sidste forsøg

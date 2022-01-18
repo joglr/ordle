@@ -9,7 +9,7 @@ import {
   guess,
   HISTORY_SIZE,
   LetterState,
-  OrdleState,
+  OrdleBoardState,
   WORD_SIZE,
   writeLetter,
 } from "../state";
@@ -36,7 +36,7 @@ function getClassNameFromLetterEntryState(state: LetterState) {
 }
 
 const OrdleContext = createContext<
-  [OrdleState, Dispatch<SetStateAction<OrdleState>>]
+  [OrdleBoardState, Dispatch<SetStateAction<OrdleBoardState>>]
 >([createEmptyState(), createEmptyState]);
 
 function useOrdleContext() {
@@ -59,7 +59,7 @@ const Home: NextPage = () => {
   );
 };
 
-function createEmptyState(): OrdleState {
+function createEmptyState(): OrdleBoardState {
   return {
     history: [],
     currentAttempt: [],
@@ -68,7 +68,8 @@ function createEmptyState(): OrdleState {
 }
 
 function App() {
-  const [ordleState, setOrdleState] = useState<OrdleState>(createEmptyState);
+  const [ordleState, setOrdleState] =
+    useState<OrdleBoardState>(createEmptyState);
 
   return (
     <OrdleContext.Provider value={[ordleState, setOrdleState]}>
@@ -103,6 +104,7 @@ function Display() {
       </Square>
     );
   }
+  console.log(ordleState);
 
   return (
     <div className={styles.display}>

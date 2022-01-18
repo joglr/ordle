@@ -26,7 +26,7 @@ export type HistoryEntry = [
 ];
 export type History = HistoryEntry[];
 
-export type OrdleState = {
+export type OrdleBoardState = {
   history: History;
   currentAttempt: string[];
   keyboardColors: Record<string, string>;
@@ -34,13 +34,16 @@ export type OrdleState = {
 
 export const WORD_SIZE = 5;
 export const HISTORY_SIZE = 6;
-export const L = (l: string, s: LetterState) => ({ letter: l, state: s });
+export const L = (l: string, s: LetterState) => ({
+  letter: l.toUpperCase(),
+  state: s,
+});
 
-export const DF = (l: string) => L(l, LetterState.DEFAULT);
+export const DF = (l: string) => L(l.toUpperCase(), LetterState.DEFAULT);
 
-export const C = (l: string) => L(l, LetterState.CORRECT);
+export const C = (l: string) => L(l.toUpperCase(), LetterState.CORRECT);
 
-export const CL = (l: string) => L(l, LetterState.CORRECT_LETTER);
+export const CL = (l: string) => L(l.toUpperCase(), LetterState.CORRECT_LETTER);
 
 export function getColorFromLetterEntryState(styles: any, state: LetterState) {
   switch (state) {
@@ -53,17 +56,7 @@ export function getColorFromLetterEntryState(styles: any, state: LetterState) {
   }
 }
 
-export function writeToSquare(
-  s: OrdleState,
-  r: number,
-  c: number,
-  v: HistoryLetter
-) {
-  s.history[r][c] = v;
-  return s;
-}
-
-export function writeLetter(l: string, os: OrdleState): OrdleState {
+export function writeLetter(l: string, os: OrdleBoardState): OrdleBoardState {
   const { history, currentAttempt, keyboardColors } = clone(os);
   if (history.length < HISTORY_SIZE && currentAttempt.length < WORD_SIZE) {
     currentAttempt.push(l);
@@ -71,7 +64,7 @@ export function writeLetter(l: string, os: OrdleState): OrdleState {
   return { history, currentAttempt, keyboardColors };
 }
 
-export function deleteLetter(os: OrdleState): OrdleState {
+export function deleteLetter(os: OrdleBoardState): OrdleBoardState {
   const { history, currentAttempt, keyboardColors } = clone(os);
   if (currentAttempt.length === 0) return os;
 
@@ -82,7 +75,7 @@ export function deleteLetter(os: OrdleState): OrdleState {
   };
 }
 
-export async function guess(s: OrdleState): Promise<GuessResponseBody> {
+export async function guess(s: OrdleBoardState): Promise<GuessResponseBody> {
   const url = new URL("/api/guess", window.location.href);
 
   const response = await fetch(url.toString(), {
@@ -100,9 +93,15 @@ export async function guess(s: OrdleState): Promise<GuessResponseBody> {
   return body;
 }
 
-export function colorize(os: OrdleState, todaysWord: string): OrdleState {
+export function colorize(
+  os: OrdleBoardState,
+  todaysWord: string
+): OrdleBoardState {
   const { history, currentAttempt, keyboardColors } = clone(os);
-  const todaysLetters = todaysWord.split("") as (string | null)[];
+  const todaysLetters = todaysWord.split("").map((x) => x.toUpperCase()) as (
+    | string
+    | null
+  )[];
   const historyEntry: HistoryEntry = [DF(""), DF(""), DF(""), DF(""), DF("")];
   for (let i = 0; i < currentAttempt.length; i++) {
     const letter = currentAttempt[i];

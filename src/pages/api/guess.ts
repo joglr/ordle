@@ -1,13 +1,9 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { colorize, OrdleState } from "../../state";
-import WORDS from "./../../../words.json";
-
-const START_TIME = new Date("Fri Jan 14 2022 00:00:00 GMT+0100");
-const START_TIME_MS = START_TIME.getTime();
-const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
+import { colorize, OrdleBoardState } from "../../state";
+import { getTodaysWord, isWord } from "../../word";
 
 export type GuessSuccessResponse = {
-  state: OrdleState;
+  state: OrdleBoardState;
   error: null;
 };
 
@@ -22,37 +18,29 @@ type GuessResponse = Omit<VercelResponse, "json"> & {
   json: (arg0: GuessResponseBody) => VercelResponse;
 };
 
-const getWordIndexFromTimeMS = (timeMS: number) => {
-  return Math.floor((timeMS - START_TIME_MS) / ONE_DAY_IN_MS) % WORDS.length;
-};
-
-const NOW_MS = new Date().getTime();
-const todaysWord = WORDS[getWordIndexFromTimeMS(NOW_MS)];
+const todaysWord = getTodaysWord();
 
 export default function guess(req: VercelRequest, res: GuessResponse) {
-  const state = req.body as unknown as OrdleState;
+  // TODO: Stop logging todays word
+  console.log("todaysWord: ", todaysWord);
 
-  if (!Array.isArray(state.currentAttempt)) {
-    return res.json({
-      error: "Only specify one word",
-      state: null,
-    });
-  }
+  const state = req.body as unknown as OrdleBoardState;
 
   if (state === undefined) {
     return res.json({
-      error: "State is required",
+      error: "Intern fejl",
       state: null,
     });
   }
 
-  const word = state.currentAttempt.map((x) => x.toLowerCase()).join("");
+  const word = state.currentAttempt.join("");
+  const wordLowercase = word.toLowerCase();
 
-  const isWord = WORDS.includes(word);
+  const wordIsWord = isWord(wordLowercase);
 
-  if (!isWord)
+  if (!wordIsWord)
     return res.json({
-      error: "Word not found",
+      error: `${word} er ikke et gyldigt ord`,
       state: null,
     });
 

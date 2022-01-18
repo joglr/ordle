@@ -8,35 +8,35 @@ import {
   History,
   HistoryLetter,
   LetterState,
-  OrdleState,
+  OrdleBoardState,
   writeLetter,
 } from "./state";
 import { last } from "./util";
 
 const almostFullHistory: History = [
-  [C("a"), C("b"), C("c"), C("d"), C("e")],
-  [C("a"), C("b"), C("c"), C("d"), C("e")],
-  [C("a"), C("b"), C("c"), C("d"), C("e")],
-  [C("a"), C("b"), C("c"), C("d"), C("e")],
-  [C("a"), C("b"), C("c"), C("d"), C("e")],
+  [C("A"), C("B"), C("C"), C("D"), C("E")],
+  [C("A"), C("B"), C("C"), C("D"), C("E")],
+  [C("A"), C("B"), C("C"), C("D"), C("E")],
+  [C("A"), C("B"), C("C"), C("D"), C("E")],
+  [C("A"), C("B"), C("C"), C("D"), C("E")],
 ];
 
 const fullHistory: History = [
-  [C("a"), C("b"), C("c"), C("d"), C("e")],
-  [C("a"), C("b"), C("c"), C("d"), C("e")],
-  [C("a"), C("b"), C("c"), C("d"), C("e")],
-  [C("a"), C("b"), C("c"), C("d"), C("e")],
-  [C("a"), C("b"), C("c"), C("d"), C("e")],
-  [C("a"), C("b"), C("c"), C("d"), C("e")],
+  [C("A"), C("B"), C("C"), C("D"), C("E")],
+  [C("A"), C("B"), C("C"), C("D"), C("E")],
+  [C("A"), C("B"), C("C"), C("D"), C("E")],
+  [C("A"), C("B"), C("C"), C("D"), C("E")],
+  [C("A"), C("B"), C("C"), C("D"), C("E")],
+  [C("A"), C("B"), C("C"), C("D"), C("E")],
 ];
 
-const fullAttempt = ["a", "b", "c", "d", "e"];
-const almostFullAttempt = ["a", "b", "d", "d"];
+const fullAttempt = ["A", "B", "C", "D", "E"];
+const almostFullAttempt = ["A", "B", "D", "D"];
 
 function mkState(
   history: History = [],
   currentAttempt: string[] = []
-): OrdleState {
+): OrdleBoardState {
   return {
     history,
     currentAttempt,
@@ -106,13 +106,13 @@ describe("deleteLetter", () => {
 
 describe("colorize", () => {
   it("increases history by one", () => {
-    const state = mkState([], ["a", "b", "c", "d", "e"]);
+    const state = mkState([], ["A", "B", "C", "D", "E"]);
     const newState = colorize(state, "abcde");
     expect(newState.history.length).toBe(1);
   });
 
   it("colorizses green if correct", () => {
-    const state = mkState([], ["a", "b", "c", "d", "e"]);
+    const state = mkState([], ["A", "B", "C", "D", "E"]);
     const newState = colorize(state, "abcde");
     for (const letter of newState.history[0]) {
       expect(letter).toStrictEqual(C(letter.letter));
@@ -120,29 +120,29 @@ describe("colorize", () => {
   });
 
   it("only colorize the first match if multiple", () => {
-    const state = mkState([], "faaaa".split(""));
-    const newState = colorize(state, "abcde");
+    const state = mkState([], "FAAAA".split(""));
+    const newState = colorize(state, "ABCDE");
 
     const [a, b, c, d, e] = newState.history[0];
 
-    expect(a).toStrictEqual(DF("f"));
-    expect(b).toStrictEqual(CL("a"));
-    expect(c).toStrictEqual(DF("a"));
-    expect(d).toStrictEqual(DF("a"));
-    expect(e).toStrictEqual(DF("a"));
+    expect(a).toStrictEqual(DF("F"));
+    expect(b).toStrictEqual(CL("A"));
+    expect(c).toStrictEqual(DF("A"));
+    expect(d).toStrictEqual(DF("A"));
+    expect(e).toStrictEqual(DF("A"));
   });
 
   it("only colorize the first match if multiple", () => {
-    const state = mkState([], "faaaa".split(""));
-    const newState = colorize(state, "aacde");
+    const state = mkState([], "FAAAA".split(""));
+    const newState = colorize(state, "AACDE");
 
     const [a, b, c, d, e] = newState.history[0];
 
-    expect(a).toStrictEqual(DF("f"));
-    expect(b).toStrictEqual(C("a"));
-    expect(c).toStrictEqual(CL("a"));
-    expect(d).toStrictEqual(DF("a"));
-    expect(e).toStrictEqual(DF("a"));
+    expect(a).toStrictEqual(DF("F"));
+    expect(b).toStrictEqual(C("A"));
+    expect(c).toStrictEqual(CL("A"));
+    expect(d).toStrictEqual(DF("A"));
+    expect(e).toStrictEqual(DF("A"));
   });
 
   it.todo("updates keyboard colors");
