@@ -6,7 +6,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "husky install"
   },
   "dependencies": {
     "jest": "^27.4.7",
@@ -26,7 +27,9 @@
     "babel-jest": "^27.4.6",
     "eslint": "8.6.0",
     "eslint-config-next": "12.0.7",
+    "husky": "^7.0.4",
     "identity-obj-proxy": "^3.0.0",
+    "lint-staged": "^12.1.7",
     "prettier": "2.5.1",
     "typescript": "4.5.4"
   },
@@ -35,5 +38,28 @@
     "not ie 11",
     "not dead",
     "not op_mini all"
-  ]
+  ],
+  "jest": {
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.ts"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/.next/",
+      "<rootDir>/node_modules/"
+    ],
+    "moduleNameMapper": {
+      "\\.(scss|sass|css)$": "identity-obj-proxy"
+    },
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}"
+    ]
+  },
+  "prettier": {},
+  "lint-staged": {
+    "**/*.ts": [
+      "eslint --cache --fix",
+      "tsc-files --noEmit"
+    ],
+    "**/*.{ts,js,css,md}": "prettier --write"
+  }
 }
