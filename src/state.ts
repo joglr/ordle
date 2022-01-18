@@ -1,3 +1,4 @@
+import { GuessResponseBody } from "./pages/api/guess";
 import { clone } from "./util";
 
 const errors = {};
@@ -62,10 +63,7 @@ export function writeToSquare(
   return s;
 }
 
-export async function writeLetter(
-  l: string,
-  os: OrdleState
-): Promise<OrdleState> {
+export function writeLetter(l: string, os: OrdleState): OrdleState {
   const { history, currentAttempt, keyboardColors } = clone(os);
   if (history.length < HISTORY_SIZE && currentAttempt.length < WORD_SIZE) {
     currentAttempt.push(l);
@@ -73,7 +71,7 @@ export async function writeLetter(
   return { history, currentAttempt, keyboardColors };
 }
 
-export async function deleteLetter(os: OrdleState): Promise<OrdleState> {
+export function deleteLetter(os: OrdleState): OrdleState {
   const { history, currentAttempt, keyboardColors } = clone(os);
   if (currentAttempt.length === 0) return os;
 
@@ -84,7 +82,7 @@ export async function deleteLetter(os: OrdleState): Promise<OrdleState> {
   };
 }
 
-export async function guess(s: OrdleState): Promise<OrdleState> {
+export async function guess(s: OrdleState): Promise<GuessResponseBody> {
   const url = new URL("/api/guess", window.location.href);
 
   const response = await fetch(url.toString(), {
@@ -94,11 +92,12 @@ export async function guess(s: OrdleState): Promise<OrdleState> {
       "Content-Type": "application/json",
     },
   });
-  const data = await response.json();
+  const body = (await response.json()) as GuessResponseBody;
+
   if (response.status !== 200) {
-    throw new Error(data.error);
+    return { error: response.statusText, state: null };
   }
-  return data;
+  return body;
 }
 
 export function colorize(os: OrdleState, todaysWord: string): OrdleState {

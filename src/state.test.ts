@@ -45,49 +45,49 @@ function mkState(
 }
 
 describe("writeToSquare", () => {
-  it("allows writing if empty history and empty attempt", async () => {
+  it("allows writing if empty history and empty attempt", () => {
     const state = mkState();
-    const newState = await writeLetter("a", state);
+    const newState = writeLetter("a", state);
 
     const expectedAttemptState = [...state.currentAttempt, "a"];
     expect(newState.currentAttempt.length).toBe(expectedAttemptState.length);
     expect(newState.currentAttempt).toStrictEqual(expectedAttemptState);
   });
 
-  it("allows writing if the history is almost full", async () => {
+  it("allows writing if the history is almost full", () => {
     const state = mkState(almostFullHistory);
-    const newState = await writeLetter("a", state);
+    const newState = writeLetter("a", state);
     const expectedAttemptState = [...state.currentAttempt, "a"];
     expect(newState.currentAttempt.length).toBe(expectedAttemptState.length);
     expect(newState.currentAttempt).toStrictEqual(expectedAttemptState);
   });
 
-  it("allow writing if attempt is almost full", async () => {
+  it("allow writing if attempt is almost full", () => {
     const state = mkState(almostFullHistory, almostFullAttempt);
-    const newState = await writeLetter("a", state);
+    const newState = writeLetter("a", state);
     const expectedAttemptState = [...state.currentAttempt, "a"];
     expect(newState.currentAttempt.length).toBe(expectedAttemptState.length);
     expect(newState.currentAttempt).toStrictEqual(expectedAttemptState);
   });
 
-  it("does not allow writing if the history is full", async () => {
+  it("does not allow writing if the history is full", () => {
     const state = mkState(fullHistory);
-    const newState = await writeLetter("a", state);
+    const newState = writeLetter("a", state);
     expect(newState).toStrictEqual(state);
   });
 
-  it("does not allow writing if attempt is full", async () => {
+  it("does not allow writing if attempt is full", () => {
     const state = mkState([], fullAttempt);
-    const newState = await writeLetter("a", state);
+    const newState = writeLetter("a", state);
     expect(newState).toStrictEqual(state);
   });
 });
 
 describe("deleteLetter", () => {
-  it("deletes the most recent letter", async () => {
+  it("deletes the most recent letter", () => {
     const state = mkState(almostFullHistory, almostFullAttempt);
 
-    const newState = await deleteLetter(state);
+    const newState = deleteLetter(state);
     expect(newState.currentAttempt.length).toBe(
       state.currentAttempt.length - 1
     );
@@ -96,10 +96,10 @@ describe("deleteLetter", () => {
     );
   });
 
-  it("does not affect an empty attempt", async () => {
+  it("does not affect an empty attempt", () => {
     const state = mkState();
 
-    const newState = await deleteLetter(state);
+    const newState = deleteLetter(state);
     expect(newState).toStrictEqual(state);
   });
 });
