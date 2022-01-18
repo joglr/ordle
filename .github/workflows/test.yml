@@ -11,7 +11,6 @@ on:
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -23,3 +22,6 @@ jobs:
         cache: 'yarn'
     - run: yarn install --frozen-lockfile
     - run: yarn test
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
