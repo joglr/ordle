@@ -4,14 +4,11 @@ import {
   colorize,
   deleteLetter,
   DF,
-  guess,
   History,
-  HistoryLetter,
-  LetterState,
+  INC,
   OrdleBoardState,
   writeLetter,
 } from "./state";
-import { last } from "./util";
 
 const almostFullHistory: History = [
   [C("A"), C("B"), C("C"), C("D"), C("E")],
@@ -125,11 +122,11 @@ describe("colorize", () => {
 
     const [a, b, c, d, e] = newState.history[0];
 
-    expect(a).toStrictEqual(DF("F"));
+    expect(a).toStrictEqual(INC("F"));
     expect(b).toStrictEqual(CL("A"));
-    expect(c).toStrictEqual(DF("A"));
-    expect(d).toStrictEqual(DF("A"));
-    expect(e).toStrictEqual(DF("A"));
+    expect(c).toStrictEqual(INC("A"));
+    expect(d).toStrictEqual(INC("A"));
+    expect(e).toStrictEqual(INC("A"));
   });
 
   it("only colorize the first match if multiple", () => {
@@ -138,11 +135,11 @@ describe("colorize", () => {
 
     const [a, b, c, d, e] = newState.history[0];
 
-    expect(a).toStrictEqual(DF("F"));
+    expect(a).toStrictEqual(INC("F"));
     expect(b).toStrictEqual(C("A"));
     expect(c).toStrictEqual(CL("A"));
-    expect(d).toStrictEqual(DF("A"));
-    expect(e).toStrictEqual(DF("A"));
+    expect(d).toStrictEqual(INC("A"));
+    expect(e).toStrictEqual(INC("A"));
   });
 
   it.todo("updates keyboard colors");

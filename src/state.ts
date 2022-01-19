@@ -8,6 +8,8 @@ export enum LetterState {
   INCORRECT = "INCORRECT",
   CORRECT = "CORRECT",
   CORRECT_LETTER = "CORRECT_LETTER",
+  EMPTY = "EMPTY",
+  ATTEMPT = "ATTEMPT",
 }
 
 export interface HistoryLetter {
@@ -42,6 +44,7 @@ export const L = (l: string, s: LetterState) => ({
 export const DF = (l: string) => L(l.toUpperCase(), LetterState.DEFAULT);
 
 export const C = (l: string) => L(l.toUpperCase(), LetterState.CORRECT);
+export const INC = (l: string) => L(l.toUpperCase(), LetterState.INCORRECT);
 
 export const CL = (l: string) => L(l.toUpperCase(), LetterState.CORRECT_LETTER);
 
@@ -115,7 +118,7 @@ export function colorize(
       todaysLetters[index] = null;
       value = CL(letter);
     } else {
-      value = L(letter, LetterState.DEFAULT);
+      value = L(letter, LetterState.INCORRECT);
     }
     historyEntry[i] = value;
     // TODO: Update keyboardColors
