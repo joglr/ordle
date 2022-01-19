@@ -54,7 +54,17 @@
     },
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}"
-    ]
+    ],
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": [
+        "babel-jest",
+        {
+          "presets": [
+            "next/babel"
+          ]
+        }
+      ]
+    }
   },
   "prettier": {},
   "lint-staged": {
