@@ -1,23 +1,58 @@
 :root {
   --u: 1em;
 
-  --black: hsl(0, 0%, 0%);
-  --green: rgb(76, 175, 76);
-  --yellow: rgb(202, 202, 86);
+  --black: hsl(0, 0%, 7%);
+  --white: hsl(0, 0%, 85%);
+  --lightGrey: hsl(0, 0%, 70%);
+  --lightGreyFaded: hsla(0, 0%, 36%, 0.3);
+  --grey: hsl(0, 0%, 50%);
+  --darkGrey: hsl(0, 0%, 22%);
+  --darkGreyFaded: hsla(0, 0%, 22%, 0.5);
+
+  --green: hsl(120, 39%, 40%);
+  --lightGreen: hsl(120, 39%, 49%);
+
+  --yellow: hsl(60, 60%, 40%);
+  --lightYellow: hsl(60, 52%, 56%);
+
+  --correct: var(--green);
+  --correctLetter: var(--yellow);
+  --incorrect: var(--grey);
+
+  --correctText: var(--black);
+  --correctLetterText: var(--black);
+  --incorrectText: var(--black);
 
   --wordSize: 5;
   --attempts: 6;
 
-  --primary: #d8d8d8;
-  --secondary: #a1a1a1;
-  --text: hsl(0, 0%, 0%);
+  --background: var(--lightGrey);
+  --foreground: var(--grey);
+  --keyboard: var(--darkGrey);
+  --keyboardText: var(--black);
+  --keyboardShadow: var(--darkGreyFaded);
+
+  --text: var(--black);
+  --attemptOutline: var(--darkGrey);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --primary: #111111;
-    --secondary: #383838;
-    --text: #bdbdbd;
+    --background: var(--black);
+    --foreground: var(--darkGrey);
+    --keyboard: var(--darkGrey);
+    --keyboardText: var(--lightGrey);
+    --keyboardShadow: var(--lightGreyFaded);
+    --text: var(--white);
+    --attemptOutline: var(--grey);
+
+    --correct: var(--lightGreen);
+    --correctLetter: var(--lightYellow);
+    --incorrect: var(--darkGrey);
+
+    --incorrectText: var(--white);
+    --correctText: var(--black);
+    --correctLetterText: var(--black);
   }
 }
 
@@ -30,7 +65,7 @@ body {
 }
 
 body {
-  background-color: var(--primary);
+  background-color: var(--background);
   color: var(--text);
 }
 

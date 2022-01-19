@@ -23,7 +23,7 @@
 
 .square {
   /* height: 3 * var(--u); */
-  border: 2px solid var(--secondary);
+  border: 2px solid var(--foreground);
   /* margin: 2px;
   aspect-ratio: 1; */
   display: grid;
@@ -41,15 +41,25 @@
 }
 
 .correct {
-  background-color: var(--green);
-  color: var(--black) !important;
-  border-color: var(--green);
+  background-color: var(--correct);
+  color: var(--correctText) !important;
+  border-color: var(--correct);
 }
 
 .correctSpot {
-  background-color: var(--yellow);
-  color: var(--black) !important;
-  border-color: var(--yellow);
+  background-color: var(--correctLetter);
+  color: var(--correctLetterText) !important;
+  border-color: var(--correctLetter);
+}
+
+.incorrect {
+  background-color: var(--incorrect);
+  color: var(--incorrectText) !important;
+  border-color: var(--incorrect);
+}
+
+.attempt {
+  border-color: var(--attemptOutline);
 }
 
 .keyboard {
@@ -68,11 +78,22 @@
   min-width: calc(2 * var(--u));
 
   border-radius: calc(var(--u) / 3);
-  /* border: 2px solid var(--text); */
-  border: none;
-  background-color: var(--secondary);
-  color: var(--text);
+  border: 1px solid var(--keyboard);
+
+  background-color: transparent;
+  color: var(--keyboardText);
   font-weight: bold;
   font-size: calc(1 * var(--u));
   cursor: pointer;
+  box-shadow: 0 1px 0 0.5px var(--keyboardShadow);
+  transition-property: box-shadow, transform;
+  transition-duration: 100ms;
+  transition-timing-function: ease;
+  /* transform: translateY(0); */
+}
+
+.key:active,
+.key.active {
+  transform: translateY(1px);
+  box-shadow: 0 0 0 0 var(--keyboardShadow);
 }

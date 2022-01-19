@@ -30,6 +30,10 @@ function getClassNameFromLetterEntryState(state: LetterState) {
       return styles.correctSpot;
     case LetterState.INCORRECT:
       return styles.incorrect;
+    case LetterState.ATTEMPT:
+      return styles.attempt;
+    case LetterState.DEFAULT:
+      return styles.default;
     default:
       return "";
   }
@@ -91,7 +95,7 @@ function Display() {
   const currentAttemptRemainingSquares = [];
   for (let i = 0; i < attemptsRemaining; i++) {
     attemptsRemainingSquares.push(
-      <Square className={getClassNameFromLetterEntryState(LetterState.DEFAULT)}>
+      <Square className={getClassNameFromLetterEntryState(LetterState.EMPTY)}>
         {" "}
       </Square>
     );
@@ -99,7 +103,7 @@ function Display() {
 
   for (let i = 0; i < currentLettersRemaining; i++) {
     currentAttemptRemainingSquares.push(
-      <Square className={getClassNameFromLetterEntryState(LetterState.DEFAULT)}>
+      <Square className={getClassNameFromLetterEntryState(LetterState.EMPTY)}>
         {" "}
       </Square>
     );
@@ -123,7 +127,7 @@ function Display() {
       {ordleState.currentAttempt.map((letter, i) => (
         <Square
           key={`${letter}-${i}`}
-          className={getClassNameFromLetterEntryState(LetterState.DEFAULT)}
+          className={getClassNameFromLetterEntryState(LetterState.ATTEMPT)}
         >
           {letter}
         </Square>
