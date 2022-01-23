@@ -65,18 +65,20 @@
 
 .keyboard {
   margin: calc(1.25 * var(--u)) calc(0.25 * var(--u));
-}
-
-.keyrow {
-  width: fit-content;
-  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  place-items: center;
+  justify-items: stretch;
 }
 
 .key {
-  font-family: monospace;
   margin: calc(0.1 * var(--u));
-  padding: calc(1 * var(--u)) calc(0.65 * var(--u));
-  min-width: calc(2 * var(--u));
+  /* padding-top: calc(1 * var(--u)) calc(0.65 * var(--u));
+  padding-bottom: calc(1 * var(--u)) calc(0.65 * var(--u)); */
+
+  min-height: calc(3 * var(--u));
+  /* min-width: calc(3 * var(--u)); */
 
   border-radius: calc(var(--u) / 3);
   border: 1px solid var(--keyboard);
@@ -95,12 +97,12 @@
 }
 
 .key:active,
-.key.active {
+.active {
   transform: translateY(1px);
   box-shadow: 0 0 0 0 var(--keyboardShadow);
   border-color: var(--keyboardShadow);
 }
 
-.key.wide {
+.wide {
   grid-column: span 2;
 }

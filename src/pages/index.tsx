@@ -193,7 +193,7 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
   const deleteKeyDisabled =
     lettersDisabled || board.currentAttempt.length === 0;
   return (
-    <div className={styles.keyrow}>
+    <>
       {props.row.map((key, index) => (
         <KeyboardButton
           key={index}
@@ -207,6 +207,7 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
               board: writeLetter(key, board),
             }))
           }
+          wide={false}
         />
       ))}
       {props.final ? (
@@ -216,6 +217,7 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
           onClick={() =>
             setOrdleState((prev) => ({ ...prev, board: deleteLetter(board) }))
           }
+          wide
           disabled={deleteKeyDisabled}
         />
       ) : null}
@@ -224,25 +226,34 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
           disabled={guessKeyDisabled}
           text="Guess"
           onClick={enterHandler}
-          className=""
+          wide
         />
       ) : null}
-    </div>
+    </>
   );
 }
 
-function KeyboardButton(
-  props: {
-    text: string;
-    disabled: boolean;
-  } & React.HTMLAttributes<HTMLButtonElement>
-) {
+function KeyboardButton({
+  text,
+  wide,
+  ...props
+}: {
+  text: string;
+  disabled: boolean;
+  wide: boolean;
+} & React.HTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}
-      className={clsx(styles.key, props.disabled && styles.active)}
+      className={clsx([
+        {
+          [styles.key]: true,
+          [styles.active]: props.disabled,
+          [styles.wide]: wide,
+        },
+      ])}
     >
-      {props.text}
+      {text}
     </button>
   );
 }
