@@ -87,14 +87,20 @@
   font-size: calc(1 * var(--u));
   cursor: pointer;
   box-shadow: 0 1px 0 0.5px var(--keyboardShadow);
-  transition-property: box-shadow, transform;
+  transition-property: box-shadow, transform, border-color;
   transition-duration: 100ms;
   transition-timing-function: ease;
   /* transform: translateY(0); */
+  white-space: pre;
 }
 
 .key:active,
 .key.active {
   transform: translateY(1px);
   box-shadow: 0 0 0 0 var(--keyboardShadow);
+  border-color: var(--keyboardShadow);
+}
+
+.key.wide {
+  grid-column: span 2;
 }

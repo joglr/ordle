@@ -3,6 +3,18 @@ import { clone } from "./util";
 
 const errors = {};
 
+export interface OrdleState {
+  board: BoardState;
+  loadingState: LoadingState;
+  responseText: string | null;
+}
+
+export enum LoadingState {
+  LOADING = "LOADING",
+  SUCCESS = "SUCCESS",
+  ERROR = "ERROR",
+}
+
 export enum LetterState {
   DEFAULT = "DEFAULT",
   INCORRECT = "INCORRECT",
@@ -28,7 +40,7 @@ export type HistoryEntry = [
 ];
 export type History = HistoryEntry[];
 
-export type OrdleBoardState = {
+export type BoardState = {
   history: History;
   currentAttempt: string[];
   keyboardColors: Record<string, string>;
@@ -59,7 +71,7 @@ export function getColorFromLetterEntryState(styles: any, state: LetterState) {
   }
 }
 
-export function writeLetter(l: string, os: OrdleBoardState): OrdleBoardState {
+export function writeLetter(l: string, os: BoardState): BoardState {
   const { history, currentAttempt, keyboardColors } = clone(os);
   if (history.length < HISTORY_SIZE && currentAttempt.length < WORD_SIZE) {
     currentAttempt.push(l);
@@ -67,7 +79,7 @@ export function writeLetter(l: string, os: OrdleBoardState): OrdleBoardState {
   return { history, currentAttempt, keyboardColors };
 }
 
-export function deleteLetter(os: OrdleBoardState): OrdleBoardState {
+export function deleteLetter(os: BoardState): BoardState {
   const { history, currentAttempt, keyboardColors } = clone(os);
   if (currentAttempt.length === 0) return os;
 
@@ -78,11 +90,12 @@ export function deleteLetter(os: OrdleBoardState): OrdleBoardState {
   };
 }
 
-export async function guess(s: OrdleBoardState): Promise<GuessResponseBody> {
+export async function guess(os: OrdleState): Promise<GuessResponseBody> {
+  const { board } = os;
   const url = new URL("/api/guess", window.location.href);
 
   const response = await fetch(url.toString(), {
-    body: JSON.stringify(s),
+    body: JSON.stringify(board),
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -91,15 +104,16 @@ export async function guess(s: OrdleBoardState): Promise<GuessResponseBody> {
   const body = (await response.json()) as GuessResponseBody;
 
   if (response.status !== 200) {
-    return { error: response.statusText, state: null };
+    return {
+      loadingState: LoadingState.ERROR,
+      responseText: response.statusText,
+      board,
+    };
   }
   return body;
 }
 
-export function colorize(
-  os: OrdleBoardState,
-  todaysWord: string
-): OrdleBoardState {
+export function colorize(os: BoardState, todaysWord: string): BoardState {
   const { history, currentAttempt, keyboardColors } = clone(os);
   const todaysLetters = todaysWord.split("").map((x) => x.toUpperCase()) as (
     | string

@@ -6,7 +6,7 @@ import {
   DF,
   History,
   INC,
-  OrdleBoardState,
+  BoardState,
   writeLetter,
 } from "./state";
 
@@ -33,7 +33,7 @@ const almostFullAttempt = ["A", "B", "D", "D"];
 function mkState(
   history: History = [],
   currentAttempt: string[] = []
-): OrdleBoardState {
+): BoardState {
   return {
     history,
     currentAttempt,

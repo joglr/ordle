@@ -1,16 +1,18 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { colorize, OrdleBoardState } from "../../state";
+import { colorize, BoardState, OrdleState, LoadingState } from "../../state";
 import { getTodaysWord, isWord } from "../../word";
 
-export type GuessSuccessResponse = {
-  state: OrdleBoardState;
-  error: null;
-};
+export interface GuessSuccessResponse extends OrdleState {
+  board: BoardState;
+  loadingState: LoadingState.SUCCESS;
+  responseText: null;
+}
 
-export type GuessErrorResponse = {
-  state: null;
-  error: string;
-};
+export interface GuessErrorResponse extends OrdleState {
+  board: BoardState;
+  loadingState: LoadingState.ERROR;
+  responseText: string;
+}
 
 export type GuessResponseBody = GuessSuccessResponse | GuessErrorResponse;
 
@@ -24,30 +26,33 @@ export default function guess(req: VercelRequest, res: GuessResponse) {
   // TODO: Stop logging todays word
   console.log("todaysWord: ", todaysWord);
 
-  const state = req.body as unknown as OrdleBoardState;
+  const { board } = req.body as unknown as OrdleState;
 
-  if (state === undefined) {
+  if (board === undefined) {
     return res.json({
-      error: "Intern fejl",
-      state: null,
+      loadingState: LoadingState.ERROR,
+      responseText: "Intern fejl",
+      board,
     });
   }
 
-  const word = state.currentAttempt.join("");
+  const word = board.currentAttempt.join("");
   const wordLowercase = word.toLowerCase();
 
   const wordIsWord = isWord(wordLowercase);
 
   if (!wordIsWord)
     return res.json({
-      error: `${word} er ikke et gyldigt ord`,
-      state: null,
+      loadingState: LoadingState.ERROR,
+      responseText: `${word} er ikke et gyldigt ord`,
+      board,
     });
 
-  const newState = colorize(state, todaysWord);
+  const newBoardState = colorize(board, todaysWord);
 
   return res.json({
-    state: newState,
-    error: null,
+    loadingState: LoadingState.SUCCESS,
+    board: newBoardState,
+    responseText: null,
   });
 }

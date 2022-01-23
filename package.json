@@ -10,6 +10,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "clsx": "^1.1.1",
     "jest": "^27.4.7",
     "next": "12.0.7",
     "react": "17.0.2",

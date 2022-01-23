@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { createContext, Dispatch, SetStateAction, useContext } from "react";
@@ -9,9 +10,11 @@ import {
   guess,
   HISTORY_SIZE,
   LetterState,
-  OrdleBoardState,
+  BoardState,
   WORD_SIZE,
   writeLetter,
+  OrdleState,
+  LoadingState,
 } from "../state";
 import styles from "../styles/Home.module.css";
 import { isLast } from "../util";
@@ -40,7 +43,7 @@ function getClassNameFromLetterEntryState(state: LetterState) {
 }
 
 const OrdleContext = createContext<
-  [OrdleBoardState, Dispatch<SetStateAction<OrdleBoardState>>]
+  [OrdleState, Dispatch<SetStateAction<OrdleState>>]
 >([createEmptyState(), createEmptyState]);
 
 function useOrdleContext() {
@@ -63,17 +66,20 @@ const Home: NextPage = () => {
   );
 };
 
-function createEmptyState(): OrdleBoardState {
+function createEmptyState(): OrdleState {
   return {
-    history: [],
-    currentAttempt: [],
-    keyboardColors: {},
+    board: {
+      history: [],
+      currentAttempt: [],
+      keyboardColors: {},
+    },
+    loadingState: LoadingState.SUCCESS,
+    responseText: null,
   };
 }
 
 function App() {
-  const [ordleState, setOrdleState] =
-    useState<OrdleBoardState>(createEmptyState);
+  const [ordleState, setOrdleState] = useState<OrdleState>(createEmptyState);
 
   return (
     <OrdleContext.Provider value={[ordleState, setOrdleState]}>
@@ -87,10 +93,10 @@ function App() {
 }
 
 function Display() {
-  const [ordleState] = useOrdleContext();
+  const [{ board }] = useOrdleContext();
   const attemptsRemaining =
-    (HISTORY_SIZE - ordleState.history.length - 1) * WORD_SIZE;
-  const currentLettersRemaining = WORD_SIZE - ordleState.currentAttempt.length;
+    (HISTORY_SIZE - board.history.length - 1) * WORD_SIZE;
+  const currentLettersRemaining = WORD_SIZE - board.currentAttempt.length;
   const attemptsRemainingSquares = [];
   const currentAttemptRemainingSquares = [];
   for (let i = 0; i < attemptsRemaining; i++) {
@@ -108,11 +114,10 @@ function Display() {
       </Square>
     );
   }
-  console.log(ordleState);
 
   return (
     <div className={styles.display}>
-      {ordleState.history.map((row, i) => (
+      {board.history.map((row, i) => (
         <>
           {row.map((letter, j) => (
             <Square
@@ -124,7 +129,7 @@ function Display() {
           ))}
         </>
       ))}
-      {ordleState.currentAttempt.map((letter, i) => (
+      {board.currentAttempt.map((letter, i) => (
         <Square
           key={`${letter}-${i}`}
           className={getClassNameFromLetterEntryState(LetterState.ATTEMPT)}
@@ -145,7 +150,7 @@ function Square(props: {
 }) {
   return (
     <div
-      className={`${styles.square} ${props.className}`}
+      className={clsx(styles.square, props.className)}
       // onClick={props.onClick}
     >
       {props.children}
@@ -164,35 +169,61 @@ function Keyboard() {
 }
 
 function KeyboardRow(props: { row: string[]; final?: boolean }) {
-  const { addToast } = useToasts();
   const [ordleState, setOrdleState] = useOrdleContext();
+  const { board, loadingState } = ordleState;
+  const { addToast } = useToasts();
 
   async function enterHandler() {
+    if (loadingState === LoadingState.LOADING) return;
     // TODO: Block more submissions while waiting judgement
-    const { state, error } = await guess(ordleState);
-    if (error && state === null)
-      addToast(error, { appearance: "error", autoDismiss: true });
-    if (error === null && state !== null) setOrdleState(state);
+    setOrdleState((prev) => ({ ...prev, loadingState: LoadingState.LOADING }));
+    const response = await guess(ordleState);
+    if (response.loadingState === "ERROR") {
+      addToast(response.responseText, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+    setOrdleState(response);
   }
+
+  const lettersDisabled = loadingState === LoadingState.LOADING;
+  const guessKeyDisabled =
+    lettersDisabled || board.currentAttempt.length < WORD_SIZE;
+  const deleteKeyDisabled =
+    lettersDisabled || board.currentAttempt.length === 0;
   return (
     <div className={styles.keyrow}>
-      {props.final ? (
-        <KeyboardButton text="Enter" onClick={enterHandler} className="" />
-      ) : null}
       {props.row.map((key, index) => (
         <KeyboardButton
           key={index}
           text={key}
-          className=""
+          disabled={lettersDisabled}
           // TODO: Map of best key state
           // className={getClassNameFromLetterEntryState()}
-          onClick={() => setOrdleState(writeLetter(key, ordleState))}
+          onClick={() =>
+            setOrdleState((prev) => ({
+              ...prev,
+              board: writeLetter(key, board),
+            }))
+          }
         />
       ))}
       {props.final ? (
         <KeyboardButton
-          text="Delete"
-          onClick={() => setOrdleState(deleteLetter(ordleState))}
+          text="⬅"
+          title="Delete"
+          onClick={() =>
+            setOrdleState((prev) => ({ ...prev, board: deleteLetter(board) }))
+          }
+          disabled={deleteKeyDisabled}
+        />
+      ) : null}
+      {props.final ? (
+        <KeyboardButton
+          disabled={guessKeyDisabled}
+          text="Guess"
+          onClick={enterHandler}
           className=""
         />
       ) : null}
@@ -200,13 +231,17 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
   );
 }
 
-function KeyboardButton(props: {
-  text: string;
-  className: string;
-  onClick: () => void;
-}) {
+function KeyboardButton(
+  props: {
+    text: string;
+    disabled: boolean;
+  } & React.HTMLAttributes<HTMLButtonElement>
+) {
   return (
-    <button className={styles.key} onClick={props.onClick}>
+    <button
+      {...props}
+      className={clsx(styles.key, props.disabled && styles.active)}
+    >
       {props.text}
     </button>
   );
