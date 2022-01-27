@@ -153,6 +153,7 @@ function Square(props: {
 
 function Keyboard() {
   const [os, setOrdleState] = useOrdleContext();
+  const { addToast } = useToasts();
 
   async function keyupHandler(e: KeyboardEvent) {
     if (e.metaKey || e.ctrlKey || e.altKey) {
@@ -173,7 +174,14 @@ function Keyboard() {
       }));
     }
     if (e.key === "Enter") {
-      setOrdleState(await guess(os));
+      const response = await guess(os);
+      if (response.loadingState === "ERROR") {
+        addToast(response.responseText, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      }
+      setOrdleState(response);
     }
   }
   useEffect(() => {
