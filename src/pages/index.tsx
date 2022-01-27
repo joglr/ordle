@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { NextPage } from "next";
-import type { Dispatch } from "react";
+import { Dispatch, useEffect } from "react";
 import type { OrdleState, History } from "../state";
 import Head from "next/head";
 import { createContext, SetStateAction, useContext } from "react";
@@ -152,6 +152,34 @@ function Square(props: {
 }
 
 function Keyboard() {
+  const [os, setOrdleState] = useOrdleContext();
+
+  async function keyupHandler(e: KeyboardEvent) {
+    if (e.metaKey || e.ctrlKey || e.altKey) {
+      return;
+    }
+    const letter = e.key.toUpperCase();
+    if (keyboard.some((row) => row.includes(letter))) {
+      setOrdleState((prev) => ({
+        ...prev,
+        board: writeLetter(letter, os.board),
+      }));
+      return;
+    }
+    if (e.key === "Backspace") {
+      setOrdleState((prev) => ({
+        ...prev,
+        board: deleteLetter(os.board),
+      }));
+    }
+    if (e.key === "Enter") {
+      setOrdleState(await guess(os));
+    }
+  }
+  useEffect(() => {
+    window.addEventListener("keyup", keyupHandler);
+    return () => window.removeEventListener("keyup", keyupHandler);
+  });
   return (
     <div className={styles.keyboard}>
       {keyboard.map((row, index) => (
