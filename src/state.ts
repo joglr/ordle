@@ -1,7 +1,5 @@
-import { GuessResponseBody } from "./pages/api/guess";
+// import { GuessResponseBody } from "./pages/api/guess";
 import { clone } from "./util";
-
-const errors = {};
 
 export interface OrdleState {
   board: BoardState;
@@ -60,6 +58,18 @@ export const INC = (l: string) => L(l.toUpperCase(), LetterState.INCORRECT);
 
 export const CL = (l: string) => L(l.toUpperCase(), LetterState.CORRECT_LETTER);
 
+export function createEmptyState(): OrdleState {
+  return {
+    board: {
+      history: [],
+      currentAttempt: [],
+      keyboardColors: {},
+    },
+    loadingState: LoadingState.SUCCESS,
+    responseText: null,
+  };
+}
+
 export function getColorFromLetterEntryState(styles: any, state: LetterState) {
   switch (state) {
     case LetterState.CORRECT:
@@ -90,27 +100,32 @@ export function deleteLetter(os: BoardState): BoardState {
   };
 }
 
-export async function guess(os: OrdleState): Promise<GuessResponseBody> {
+export async function guess(os: OrdleState): Promise<OrdleState> {
   const { board } = os;
   const url = new URL("/api/guess", window.location.href);
 
-  const response = await fetch(url.toString(), {
-    body: JSON.stringify(board),
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const body = (await response.json()) as GuessResponseBody;
+  try {
+    const response = await fetch(url.toString(), {
+      body: JSON.stringify(os),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const body = (await response.json()) as OrdleState;
 
-  if (response.status !== 200) {
+    if (response.ok && response.status === 200) {
+      return body;
+    } else {
+      throw new Error(body.responseText ?? "Intern fejl");
+    }
+  } catch (e) {
     return {
       loadingState: LoadingState.ERROR,
-      responseText: response.statusText,
+      responseText: "Der kunne ikke oprettes forbindelse",
       board,
     };
   }
-  return body;
 }
 
 export function colorize(os: BoardState, todaysWord: string): BoardState {

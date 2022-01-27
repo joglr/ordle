@@ -96,6 +96,10 @@
   white-space: pre;
 }
 
+.key[disabled] {
+  cursor: default;
+}
+
 .key:active,
 .active {
   transform: translateY(1px);

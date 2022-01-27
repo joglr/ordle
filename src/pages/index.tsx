@@ -1,20 +1,20 @@
 import clsx from "clsx";
 import type { NextPage } from "next";
+import type { Dispatch } from "react";
+import type { OrdleState, History } from "../state";
 import Head from "next/head";
-import { createContext, Dispatch, SetStateAction, useContext } from "react";
+import { createContext, SetStateAction, useContext } from "react";
 import { useState } from "react";
 import { ToastProvider, useToasts } from "react-toast-notifications";
 import {
+  LetterState,
+  LoadingState,
   deleteLetter,
-  DF,
   guess,
   HISTORY_SIZE,
-  LetterState,
-  BoardState,
   WORD_SIZE,
   writeLetter,
-  OrdleState,
-  LoadingState,
+  createEmptyState,
 } from "../state";
 import styles from "../styles/Home.module.css";
 import { isLast } from "../util";
@@ -66,18 +66,6 @@ const Home: NextPage = () => {
   );
 };
 
-function createEmptyState(): OrdleState {
-  return {
-    board: {
-      history: [],
-      currentAttempt: [],
-      keyboardColors: {},
-    },
-    loadingState: LoadingState.SUCCESS,
-    responseText: null,
-  };
-}
-
 function App() {
   const [ordleState, setOrdleState] = useState<OrdleState>(createEmptyState);
 
@@ -93,13 +81,16 @@ function App() {
 }
 
 function Display() {
-  const [{ board }] = useOrdleContext();
-  const attemptsRemaining =
-    (HISTORY_SIZE - board.history.length - 1) * WORD_SIZE;
-  const currentLettersRemaining = WORD_SIZE - board.currentAttempt.length;
+  const [
+    {
+      board: { history, currentAttempt },
+    },
+  ] = useOrdleContext();
+  const attemptsRemaining = getRemainingAttempts(history);
+  const currentLettersRemaining = WORD_SIZE - currentAttempt.length;
   const attemptsRemainingSquares = [];
   const currentAttemptRemainingSquares = [];
-  for (let i = 0; i < attemptsRemaining; i++) {
+  for (let i = 0; i < (attemptsRemaining - 1) * WORD_SIZE; i++) {
     attemptsRemainingSquares.push(
       <Square className={getClassNameFromLetterEntryState(LetterState.EMPTY)}>
         {" "}
@@ -107,17 +98,19 @@ function Display() {
     );
   }
 
-  for (let i = 0; i < currentLettersRemaining; i++) {
-    currentAttemptRemainingSquares.push(
-      <Square className={getClassNameFromLetterEntryState(LetterState.EMPTY)}>
-        {" "}
-      </Square>
-    );
+  if (attemptsRemaining > 0) {
+    for (let i = 0; i < currentLettersRemaining; i++) {
+      currentAttemptRemainingSquares.push(
+        <Square className={getClassNameFromLetterEntryState(LetterState.EMPTY)}>
+          {" "}
+        </Square>
+      );
+    }
   }
 
   return (
     <div className={styles.display}>
-      {board.history.map((row, i) => (
+      {history.map((row, i) => (
         <>
           {row.map((letter, j) => (
             <Square
@@ -129,7 +122,7 @@ function Display() {
           ))}
         </>
       ))}
-      {board.currentAttempt.map((letter, i) => (
+      {currentAttempt.map((letter, i) => (
         <Square
           key={`${letter}-${i}`}
           className={getClassNameFromLetterEntryState(LetterState.ATTEMPT)}
@@ -186,8 +179,10 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
     }
     setOrdleState(response);
   }
+  const attemptsRemaining = getRemainingAttempts(board.history);
 
-  const lettersDisabled = loadingState === LoadingState.LOADING;
+  const lettersDisabled =
+    loadingState === LoadingState.LOADING || attemptsRemaining === 0;
   const guessKeyDisabled =
     lettersDisabled || board.currentAttempt.length < WORD_SIZE;
   const deleteKeyDisabled =
@@ -224,7 +219,7 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
       {props.final ? (
         <KeyboardButton
           disabled={guessKeyDisabled}
-          text="Guess"
+          text="Gæt"
           onClick={enterHandler}
           wide
         />
@@ -256,6 +251,10 @@ function KeyboardButton({
       {text}
     </button>
   );
+}
+
+function getRemainingAttempts(history: History) {
+  return HISTORY_SIZE - history.length;
 }
 
 export default Home;
