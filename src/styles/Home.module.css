@@ -41,24 +41,6 @@
     color 0.2s ease-in-out;
 }
 
-.correct {
-  background-color: var(--correct);
-  color: var(--correctText) !important;
-  border-color: var(--correct);
-}
-
-.correctSpot {
-  background-color: var(--correctLetter);
-  color: var(--correctLetterText) !important;
-  border-color: var(--correctLetter);
-}
-
-.incorrect {
-  background-color: var(--incorrect);
-  color: var(--incorrectText) !important;
-  border-color: var(--incorrect);
-}
-
 .attempt {
   border-color: var(--attemptOutline);
 }
@@ -109,4 +91,22 @@
 
 .wide {
   grid-column: span 2;
+}
+
+.correct {
+  background-color: var(--correct);
+  color: var(--correctText);
+  border-color: var(--correct);
+}
+
+.correctSpot {
+  background-color: var(--correctLetter);
+  color: var(--correctLetterText);
+  border-color: var(--correctLetter);
+}
+
+.incorrect {
+  background-color: var(--incorrect);
+  color: var(--incorrectText);
+  border-color: var(--incorrect);
 }
