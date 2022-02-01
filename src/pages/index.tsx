@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { NextPage } from "next";
-import { Dispatch, HTMLAttributes, KeyboardEvent, useEffect } from "react";
+import { Dispatch, HTMLAttributes, useEffect } from "react";
 import { OrdleState, History, keyboard } from "../state";
 import Head from "next/head";
 import { createContext, SetStateAction, useContext } from "react";
@@ -225,7 +225,6 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
       {props.row.map((key, index) => {
         const letterState = ordleState.board.keyboardColors[key];
         const className = getClassNameFromLetterEntryState(letterState);
-        console.log(className);
         return (
           <KeyboardButton
             key={`${key}-${letterState.toString()}`}
@@ -286,7 +285,7 @@ function KeyboardButton({
           [styles.key]: true,
           [styles.active]: props.disabled,
           [styles.wide]: wide,
-          [props.className]: Boolean(props.className),
+          [props.className ?? ""]: Boolean(props.className),
         },
       ])}
     >
