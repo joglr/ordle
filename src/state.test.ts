@@ -8,6 +8,8 @@ import {
   INC,
   BoardState,
   writeLetter,
+  getBestLetterState,
+  LetterState,
 } from "./state";
 
 const almostFullHistory: History = [
@@ -143,4 +145,23 @@ describe("colorize", () => {
   });
 
   it.todo("updates keyboard colors");
+});
+
+describe("getBestLetterState", () => {
+  it("prefers C over CL", () => {
+    expect(
+      getBestLetterState(LetterState.CORRECT, LetterState.CORRECT_LETTER)
+    ).toBe(LetterState.CORRECT);
+    expect(
+      getBestLetterState(LetterState.CORRECT_LETTER, LetterState.CORRECT)
+    ).toBe(LetterState.CORRECT);
+  });
+  it("prefers CL over INC", () => {
+    expect(
+      getBestLetterState(LetterState.CORRECT_LETTER, LetterState.INCORRECT)
+    ).toBe(LetterState.CORRECT_LETTER);
+    expect(
+      getBestLetterState(LetterState.INCORRECT, LetterState.CORRECT_LETTER)
+    ).toBe(LetterState.CORRECT_LETTER);
+  });
 });
