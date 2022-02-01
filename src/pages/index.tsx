@@ -138,27 +138,38 @@ function Square(props: { children: string; className: string }) {
 
 function Keyboard() {
   const [os, setOrdleState] = useOrdleContext();
+  const { loadingState, board } = os;
   const { addToast } = useToasts();
 
   async function keyupHandler(e: KeyboardEvent) {
+    const attemptsRemaining = getRemainingAttempts(board.history);
+    const lettersDisabled =
+      loadingState === LoadingState.LOADING || attemptsRemaining === 0;
+    const guessKeyDisabled =
+      lettersDisabled || board.currentAttempt.length < WORD_SIZE;
+    const deleteKeyDisabled =
+      lettersDisabled || board.currentAttempt.length === 0;
     if (e.metaKey || e.ctrlKey || e.altKey) {
       return;
     }
     const letter = e.key.toUpperCase();
-    if (keyboard.some((row: string[]) => row.includes(letter))) {
+    if (
+      keyboard.some((row: string[]) => row.includes(letter)) &&
+      !lettersDisabled
+    ) {
       setOrdleState((prev) => ({
         ...prev,
         board: writeLetter(letter, os.board),
       }));
       return;
     }
-    if (e.key === "Backspace") {
+    if (e.key === "Backspace" && !deleteKeyDisabled) {
       setOrdleState((prev: OrdleState) => ({
         ...prev,
         board: deleteLetter(os.board),
       }));
     }
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !guessKeyDisabled) {
       const response = await guess(os);
       if (response.loadingState === "ERROR") {
         addToast(response.responseText, {
