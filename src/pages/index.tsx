@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import type { NextPage } from "next";
-import { Dispatch, useEffect } from "react";
-import type { OrdleState, History } from "../state";
+import { Dispatch, HTMLAttributes, useEffect } from "react";
+import { OrdleState, History, keyboard } from "../state";
 import Head from "next/head";
 import { createContext, SetStateAction, useContext } from "react";
 import { useState } from "react";
@@ -18,12 +18,6 @@ import {
 } from "../state";
 import styles from "../styles/Home.module.css";
 import { isLast } from "../util";
-
-const keyboard = [
-  "QWERTYUIOPÅ".split(""),
-  "ASDFGHJKLÆØ".split(""),
-  "ZXCVBNM".split(""),
-];
 
 function getClassNameFromLetterEntryState(state: LetterState) {
   switch (state) {
@@ -160,7 +154,7 @@ function Keyboard() {
       return;
     }
     const letter = e.key.toUpperCase();
-    if (keyboard.some((row) => row.includes(letter))) {
+    if (keyboard.some((row: string[]) => row.includes(letter))) {
       setOrdleState((prev) => ({
         ...prev,
         board: writeLetter(letter, os.board),
@@ -168,7 +162,7 @@ function Keyboard() {
       return;
     }
     if (e.key === "Backspace") {
-      setOrdleState((prev) => ({
+      setOrdleState((prev: OrdleState) => ({
         ...prev,
         board: deleteLetter(os.board),
       }));
@@ -205,7 +199,10 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
   async function enterHandler() {
     if (loadingState === LoadingState.LOADING) return;
     // TODO: Block more submissions while waiting judgement
-    setOrdleState((prev) => ({ ...prev, loadingState: LoadingState.LOADING }));
+    setOrdleState((prev: OrdleState) => ({
+      ...prev,
+      loadingState: LoadingState.LOADING,
+    }));
     const response = await guess(ordleState);
     if (response.loadingState === "ERROR") {
       addToast(response.responseText, {
@@ -225,28 +222,35 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
     lettersDisabled || board.currentAttempt.length === 0;
   return (
     <>
-      {props.row.map((key, index) => (
-        <KeyboardButton
-          key={index}
-          text={key}
-          disabled={lettersDisabled}
-          // TODO: Map of best key state
-          // className={getClassNameFromLetterEntryState()}
-          onClick={() =>
-            setOrdleState((prev) => ({
-              ...prev,
-              board: writeLetter(key, board),
-            }))
-          }
-          wide={false}
-        />
-      ))}
+      {props.row.map((key, index) => {
+        const letterState = ordleState.board.keyboardColors[key];
+        const className = getClassNameFromLetterEntryState(letterState);
+        return (
+          <KeyboardButton
+            key={`${key}-${letterState.toString()}`}
+            text={key}
+            disabled={lettersDisabled}
+            // TODO: Map of best key state
+            className={className}
+            onClick={() =>
+              setOrdleState((prev) => ({
+                ...prev,
+                board: writeLetter(key, board),
+              }))
+            }
+            wide={false}
+          />
+        );
+      })}
       {props.final ? (
         <KeyboardButton
           text="⬅"
           title="Delete"
           onClick={() =>
-            setOrdleState((prev) => ({ ...prev, board: deleteLetter(board) }))
+            setOrdleState((prev: OrdleState) => ({
+              ...prev,
+              board: deleteLetter(board),
+            }))
           }
           wide
           disabled={deleteKeyDisabled}
@@ -272,7 +276,7 @@ function KeyboardButton({
   text: string;
   disabled: boolean;
   wide: boolean;
-} & React.HTMLAttributes<HTMLButtonElement>) {
+} & HTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}
@@ -281,6 +285,7 @@ function KeyboardButton({
           [styles.key]: true,
           [styles.active]: props.disabled,
           [styles.wide]: wide,
+          [props.className ?? ""]: Boolean(props.className),
         },
       ])}
     >

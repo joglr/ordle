@@ -41,8 +41,14 @@ export type History = HistoryEntry[];
 export type BoardState = {
   history: History;
   currentAttempt: string[];
-  keyboardColors: Record<string, string>;
+  keyboardColors: Record<string, LetterState>;
 };
+
+export const keyboard = [
+  "QWERTYUIOPÅ".split(""),
+  "ASDFGHJKLÆØ".split(""),
+  "ZXCVBNM".split(""),
+];
 
 export const WORD_SIZE = 5;
 export const HISTORY_SIZE = 6;
@@ -59,7 +65,7 @@ export const INC = (l: string) => L(l.toUpperCase(), LetterState.INCORRECT);
 export const CL = (l: string) => L(l.toUpperCase(), LetterState.CORRECT_LETTER);
 
 export function createEmptyState(): OrdleState {
-  return {
+  const state = {
     board: {
       history: [],
       currentAttempt: [],
@@ -67,7 +73,12 @@ export function createEmptyState(): OrdleState {
     },
     loadingState: LoadingState.SUCCESS,
     responseText: null,
-  };
+  } as OrdleState;
+  const letters = [...keyboard[0], ...keyboard[1], ...keyboard[2]];
+  letters.forEach((letter) => {
+    state.board.keyboardColors[letter] = LetterState.DEFAULT;
+  });
+  return state;
 }
 
 export function getColorFromLetterEntryState(styles: any, state: LetterState) {
@@ -137,6 +148,7 @@ export function colorize(os: BoardState, todaysWord: string): BoardState {
   const historyEntry: HistoryEntry = [DF(""), DF(""), DF(""), DF(""), DF("")];
   for (let i = 0; i < currentAttempt.length; i++) {
     const letter = currentAttempt[i];
+
     const todaysLetter = todaysLetters[i];
     let value: HistoryLetter;
     if (letter === todaysLetter) {
@@ -150,11 +162,28 @@ export function colorize(os: BoardState, todaysWord: string): BoardState {
       value = L(letter, LetterState.INCORRECT);
     }
     historyEntry[i] = value;
-    // TODO: Update keyboardColors
+    let x = keyboardColors[letter];
+    keyboardColors[letter] = getBestLetterState(
+      value.state,
+      keyboardColors[letter] ?? LetterState.DEFAULT
+    );
   }
   return {
     currentAttempt: [],
     keyboardColors,
     history: [...history, historyEntry],
   };
+}
+
+export function getBestLetterState(l1: LetterState, l2: LetterState) {
+  if (l1 === LetterState.CORRECT || l2 === LetterState.CORRECT) {
+    return LetterState.CORRECT;
+  }
+  if (l1 === LetterState.CORRECT_LETTER || l2 === LetterState.CORRECT_LETTER) {
+    return LetterState.CORRECT_LETTER;
+  }
+  if (l1 === LetterState.INCORRECT || l2 === LetterState.INCORRECT) {
+    return LetterState.INCORRECT;
+  }
+  return LetterState.DEFAULT;
 }
