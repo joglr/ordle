@@ -4,13 +4,21 @@ import { clone } from "./util";
 export interface OrdleState {
   board: BoardState;
   loadingState: LoadingState;
+  gameState: GameState;
   responseText: string | null;
+  todaysWord: string | null;
 }
 
 export enum LoadingState {
   LOADING = "LOADING",
   SUCCESS = "SUCCESS",
   ERROR = "ERROR",
+}
+
+export enum GameState {
+  PLAYING = "PLAYING",
+  WIN = "WIN",
+  LOSE = "LOSE",
 }
 
 export enum LetterState {
@@ -73,6 +81,8 @@ export function createEmptyState(): OrdleState {
     },
     loadingState: LoadingState.SUCCESS,
     responseText: null,
+    gameState: GameState.PLAYING,
+    todaysWord: null,
   } as OrdleState;
   const letters = [...keyboard[0], ...keyboard[1], ...keyboard[2]];
   letters.forEach((letter) => {
@@ -132,9 +142,11 @@ export async function guess(os: OrdleState): Promise<OrdleState> {
     }
   } catch (e) {
     return {
+      gameState: GameState.PLAYING,
       loadingState: LoadingState.ERROR,
       responseText: "Der kunne ikke oprettes forbindelse",
       board,
+      todaysWord: null,
     };
   }
 }

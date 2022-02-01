@@ -1,11 +1,13 @@
 import clsx from "clsx";
 import type { NextPage } from "next";
 import { Dispatch, HTMLAttributes, useEffect } from "react";
-import { OrdleState, History, keyboard } from "../state";
+import { OrdleState, History, keyboard, GameState } from "../state";
 import Head from "next/head";
 import { createContext, SetStateAction, useContext } from "react";
 import { useState } from "react";
 import { ToastProvider, useToasts } from "react-toast-notifications";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
 import {
   LetterState,
   LoadingState,
@@ -18,6 +20,13 @@ import {
 } from "../state";
 import styles from "../styles/Home.module.css";
 import { isLast } from "../util";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 
 function getClassNameFromLetterEntryState(state: LetterState) {
   switch (state) {
@@ -62,13 +71,46 @@ const Home: NextPage = () => {
 
 function App() {
   const [ordleState, setOrdleState] = useState<OrdleState>(createEmptyState);
+  const props = useWindowSize();
 
   return (
     <OrdleContext.Provider value={[ordleState, setOrdleState]}>
+      {ordleState.gameState === GameState.WIN ? <Confetti {...props} /> : null}
       <div className={styles.container}>
         <h1 className={styles.title}>Ordle</h1>
         <Display />
         <Keyboard />
+        <Dialog open={ordleState.gameState !== GameState.PLAYING}>
+          <DialogTitle>
+            {ordleState.gameState === GameState.LOSE
+              ? "Desværre!"
+              : "Tillykke!"}
+          </DialogTitle>
+          <DialogContent
+            style={{
+              minWidth: "30vw",
+              maxWidth: "300px",
+            }}
+          >
+            {ordleState.gameState === GameState.LOSE ? (
+              <>
+                Dagens ord var..
+                <p
+                  style={{
+                    textAlign: "center",
+                  }}
+                >
+                  <b>{ordleState.todaysWord?.toUpperCase()}</b>
+                </p>
+              </>
+            ) : (
+              "Du gættede dagens ord!"
+            )}
+          </DialogContent>
+          {/* <DialogActions>
+            <Button>Del</Button>
+          </DialogActions> */}
+        </Dialog>
       </div>
     </OrdleContext.Provider>
   );
@@ -130,44 +172,46 @@ function Display() {
   );
 }
 
-function Square(props: {
-  children: string;
-  // onClick: () => void;
-  className: string;
-}) {
+function Square(props: { children: string; className: string }) {
   return (
-    <div
-      className={clsx(styles.square, props.className)}
-      // onClick={props.onClick}
-    >
-      {props.children}
-    </div>
+    <div className={clsx(styles.square, props.className)}>{props.children}</div>
   );
 }
 
 function Keyboard() {
   const [os, setOrdleState] = useOrdleContext();
+  const { loadingState, board } = os;
   const { addToast } = useToasts();
 
   async function keyupHandler(e: KeyboardEvent) {
+    const attemptsRemaining = getRemainingAttempts(board.history);
+    const lettersDisabled =
+      loadingState === LoadingState.LOADING || attemptsRemaining === 0;
+    const guessKeyDisabled =
+      lettersDisabled || board.currentAttempt.length < WORD_SIZE;
+    const deleteKeyDisabled =
+      lettersDisabled || board.currentAttempt.length === 0;
     if (e.metaKey || e.ctrlKey || e.altKey) {
       return;
     }
     const letter = e.key.toUpperCase();
-    if (keyboard.some((row: string[]) => row.includes(letter))) {
+    if (
+      keyboard.some((row: string[]) => row.includes(letter)) &&
+      !lettersDisabled
+    ) {
       setOrdleState((prev) => ({
         ...prev,
         board: writeLetter(letter, os.board),
       }));
       return;
     }
-    if (e.key === "Backspace") {
+    if (e.key === "Backspace" && !deleteKeyDisabled) {
       setOrdleState((prev: OrdleState) => ({
         ...prev,
         board: deleteLetter(os.board),
       }));
     }
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !guessKeyDisabled) {
       const response = await guess(os);
       if (response.loadingState === "ERROR") {
         addToast(response.responseText, {
@@ -198,7 +242,7 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
 
   async function enterHandler() {
     if (loadingState === LoadingState.LOADING) return;
-    // TODO: Block more submissions while waiting judgement
+
     setOrdleState((prev: OrdleState) => ({
       ...prev,
       loadingState: LoadingState.LOADING,
@@ -222,7 +266,7 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
     lettersDisabled || board.currentAttempt.length === 0;
   return (
     <>
-      {props.row.map((key, index) => {
+      {props.row.map((key) => {
         const letterState = ordleState.board.keyboardColors[key];
         const className = getClassNameFromLetterEntryState(letterState);
         return (
@@ -230,7 +274,6 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
             key={`${key}-${letterState.toString()}`}
             text={key}
             disabled={lettersDisabled}
-            // TODO: Map of best key state
             className={className}
             onClick={() =>
               setOrdleState((prev) => ({
