@@ -176,11 +176,14 @@ export function colorize(os: BoardState, todaysWord: string): BoardState {
 }
 
 export function getBestLetterState(l1: LetterState, l2: LetterState) {
+  if (l1 === LetterState.CORRECT || l2 === LetterState.CORRECT) {
+    return LetterState.CORRECT;
+  }
   if (l1 === LetterState.CORRECT_LETTER || l2 === LetterState.CORRECT_LETTER) {
     return LetterState.CORRECT_LETTER;
-  } else if (l1 === LetterState.CORRECT || l2 === LetterState.CORRECT) {
-    return LetterState.CORRECT;
-  } else {
+  }
+  if (l1 === LetterState.INCORRECT || l2 === LetterState.INCORRECT) {
     return LetterState.INCORRECT;
   }
+  return LetterState.DEFAULT;
 }
