@@ -55,6 +55,7 @@ export default function guess(req: VercelRequest, res: GuessResponse) {
       board: newBoardState,
       responseText: null,
       gameState,
+      ...(gameState === GameState.LOSE ? { todaysWord } : { todaysWord: null }),
     });
   } catch (e) {
     return res.json({
@@ -62,6 +63,7 @@ export default function guess(req: VercelRequest, res: GuessResponse) {
       loadingState: LoadingState.ERROR,
       responseText: "Intern fejl",
       board: createEmptyState().board,
+      todaysWord: null,
     });
   }
 }

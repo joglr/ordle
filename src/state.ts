@@ -6,6 +6,7 @@ export interface OrdleState {
   loadingState: LoadingState;
   gameState: GameState;
   responseText: string | null;
+  todaysWord: string | null;
 }
 
 export enum LoadingState {
@@ -17,7 +18,7 @@ export enum LoadingState {
 export enum GameState {
   PLAYING = "PLAYING",
   WIN = "WIN",
-  LOSE = "LOOSE",
+  LOSE = "LOSE",
 }
 
 export enum LetterState {
@@ -81,6 +82,7 @@ export function createEmptyState(): OrdleState {
     loadingState: LoadingState.SUCCESS,
     responseText: null,
     gameState: GameState.PLAYING,
+    todaysWord: null,
   } as OrdleState;
   const letters = [...keyboard[0], ...keyboard[1], ...keyboard[2]];
   letters.forEach((letter) => {
@@ -144,6 +146,7 @@ export async function guess(os: OrdleState): Promise<OrdleState> {
       loadingState: LoadingState.ERROR,
       responseText: "Der kunne ikke oprettes forbindelse",
       board,
+      todaysWord: null,
     };
   }
 }

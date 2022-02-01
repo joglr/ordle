@@ -1,11 +1,13 @@
 import clsx from "clsx";
 import type { NextPage } from "next";
 import { Dispatch, HTMLAttributes, useEffect } from "react";
-import { OrdleState, History, keyboard } from "../state";
+import { OrdleState, History, keyboard, GameState } from "../state";
 import Head from "next/head";
 import { createContext, SetStateAction, useContext } from "react";
 import { useState } from "react";
 import { ToastProvider, useToasts } from "react-toast-notifications";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
 import {
   LetterState,
   LoadingState,
@@ -18,6 +20,13 @@ import {
 } from "../state";
 import styles from "../styles/Home.module.css";
 import { isLast } from "../util";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 
 function getClassNameFromLetterEntryState(state: LetterState) {
   switch (state) {
@@ -62,13 +71,46 @@ const Home: NextPage = () => {
 
 function App() {
   const [ordleState, setOrdleState] = useState<OrdleState>(createEmptyState);
+  const props = useWindowSize();
 
   return (
     <OrdleContext.Provider value={[ordleState, setOrdleState]}>
+      {ordleState.gameState === GameState.WIN ? <Confetti {...props} /> : null}
       <div className={styles.container}>
         <h1 className={styles.title}>Ordle</h1>
         <Display />
         <Keyboard />
+        <Dialog open={ordleState.gameState !== GameState.PLAYING}>
+          <DialogTitle>
+            {ordleState.gameState === GameState.LOSE
+              ? "Desværre!"
+              : "Tillykke!"}
+          </DialogTitle>
+          <DialogContent
+            style={{
+              minWidth: "30vw",
+              maxWidth: "300px",
+            }}
+          >
+            {ordleState.gameState === GameState.LOSE ? (
+              <>
+                Dagens ord var..
+                <p
+                  style={{
+                    textAlign: "center",
+                  }}
+                >
+                  <b>{ordleState.todaysWord?.toUpperCase()}</b>
+                </p>
+              </>
+            ) : (
+              "Du gættede dagens ord!"
+            )}
+          </DialogContent>
+          {/* <DialogActions>
+            <Button>Del</Button>
+          </DialogActions> */}
+        </Dialog>
       </div>
     </OrdleContext.Provider>
   );
