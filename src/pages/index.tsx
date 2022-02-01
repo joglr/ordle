@@ -189,7 +189,7 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
 
   async function enterHandler() {
     if (loadingState === LoadingState.LOADING) return;
-    // TODO: Block more submissions while waiting judgement
+
     setOrdleState((prev: OrdleState) => ({
       ...prev,
       loadingState: LoadingState.LOADING,
