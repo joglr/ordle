@@ -1,4 +1,3 @@
-// import { GuessResponseBody } from "./pages/api/guess";
 import { clone } from "./util";
 
 export interface OrdleState {
@@ -157,29 +156,45 @@ export function colorize(os: BoardState, todaysWord: string): BoardState {
     | string
     | null
   )[];
-  const historyEntry: HistoryEntry = [DF(""), DF(""), DF(""), DF(""), DF("")];
+  const historyEntry = currentAttempt.map((l) => INC(l)) as HistoryEntry;
+
+  // Check correct letters
   for (let i = 0; i < currentAttempt.length; i++) {
     const letter = currentAttempt[i];
-
     const todaysLetter = todaysLetters[i];
-    let value: HistoryLetter;
+
+    if (todaysLetter === null) continue;
+
     if (letter === todaysLetter) {
       todaysLetters[i] = null;
-      value = C(letter);
-    } else if (todaysLetters.includes(letter)) {
+      historyEntry[i] = C(letter);
+    }
+  }
+
+  // Check correct letter, wrong spot
+  for (let i = 0; i < currentAttempt.length; i++) {
+    const letter = currentAttempt[i];
+    const todaysLetter = todaysLetters[i];
+
+    if (letter === null) continue;
+    if (todaysLetter === null) continue;
+
+    if (todaysLetters.includes(letter)) {
       const index = todaysLetters.indexOf(letter);
       todaysLetters[index] = null;
-      value = CL(letter);
-    } else {
-      value = L(letter, LetterState.INCORRECT);
+      historyEntry[i] = CL(letter);
     }
-    historyEntry[i] = value;
-    let x = keyboardColors[letter];
+  }
+
+  // Update keyboard colors
+  for (let i = 0; i < currentAttempt.length; i++) {
+    let letter = currentAttempt[i];
     keyboardColors[letter] = getBestLetterState(
-      value.state,
-      keyboardColors[letter] ?? LetterState.DEFAULT
+      historyEntry[i].state,
+      keyboardColors[letter] ?? LetterState.INCORRECT
     );
   }
+
   return {
     currentAttempt: [],
     keyboardColors,

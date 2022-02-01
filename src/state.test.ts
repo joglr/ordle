@@ -144,7 +144,19 @@ describe("colorize", () => {
     expect(e).toStrictEqual(INC("A"));
   });
 
-  it.todo("updates keyboard colors");
+  it("prefers correctly placed tiles over correct letters", () => {
+    const state = mkState([], "HELSE".split(""));
+    const newState = colorize(state, "HOLDE");
+    expect(newState.history[0]).toStrictEqual([
+      C("H"),
+      INC("E"),
+      C("L"),
+      INC("S"),
+      C("E"),
+    ]);
+  });
+
+  it.todo("updates keyboard colors correctly");
 });
 
 describe("getBestLetterState", () => {
