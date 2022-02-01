@@ -213,7 +213,7 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
     lettersDisabled || board.currentAttempt.length === 0;
   return (
     <>
-      {props.row.map((key, index) => {
+      {props.row.map((key) => {
         const letterState = ordleState.board.keyboardColors[key];
         const className = getClassNameFromLetterEntryState(letterState);
         return (
@@ -221,7 +221,6 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
             key={`${key}-${letterState.toString()}`}
             text={key}
             disabled={lettersDisabled}
-            // TODO: Map of best key state
             className={className}
             onClick={() =>
               setOrdleState((prev) => ({
