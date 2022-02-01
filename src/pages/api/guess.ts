@@ -1,7 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import {
   colorize,
-  BoardState,
   OrdleState,
   LoadingState,
   createEmptyState,
