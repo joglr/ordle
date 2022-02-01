@@ -46,6 +46,7 @@
 }
 
 .keyboard {
+  max-width: 100vw;
   margin: calc(1.25 * var(--u)) calc(0.25 * var(--u));
   display: grid;
   grid-template-columns: repeat(11, 1fr);
