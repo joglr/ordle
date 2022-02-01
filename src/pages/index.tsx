@@ -130,18 +130,9 @@ function Display() {
   );
 }
 
-function Square(props: {
-  children: string;
-  // onClick: () => void;
-  className: string;
-}) {
+function Square(props: { children: string; className: string }) {
   return (
-    <div
-      className={clsx(styles.square, props.className)}
-      // onClick={props.onClick}
-    >
-      {props.children}
-    </div>
+    <div className={clsx(styles.square, props.className)}>{props.children}</div>
   );
 }
 
