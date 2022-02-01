@@ -1,7 +1,7 @@
 :root {
   --u: 1em;
 
-  --black: hsl(0, 0%, 7%);
+  --black: hsl(0, 0%, 5%);
   --white: hsl(0, 0%, 95%);
   --lightGrey: hsl(0, 0%, 70%);
   --lightGreyFaded: hsla(0, 0%, 36%, 0.3);
@@ -27,7 +27,7 @@
   --wordSize: 5;
   --attempts: 6;
 
-  --background: var(--lightGrey);
+  --background: var(--white);
   --foreground: var(--grey);
   --keyboard: var(--darkGrey);
   --keyboardText: var(--black);

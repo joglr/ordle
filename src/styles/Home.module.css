@@ -25,8 +25,7 @@
 .square {
   /* height: 3 * var(--u); */
   border: 2px solid var(--foreground);
-  /* margin: 2px;
-  aspect-ratio: 1; */
+  border-radius: 4px;
   display: grid;
   place-items: center;
   /* outline: 1px red solid; */
@@ -37,12 +36,13 @@
   background-color: var(--primary);
   color: var(--text);
   text-transform: uppercase;
-  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out,
-    color 0.2s ease-in-out;
+  transition: background-color 300ms ease-in-out, border-color 300ms ease-in-out,
+    color 300ms ease-in-out;
 }
 
 .attempt {
-  border-color: var(--attemptOutline);
+  animation: jump 100ms ease-in-out;
+  animation-fill-mode: forwards;
 }
 
 .keyboard {
@@ -109,4 +109,18 @@
   background-color: var(--incorrect);
   color: var(--incorrectText);
   border-color: var(--incorrect);
+}
+
+@keyframes jump {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.05);
+    border-color: var(--attemptOutline);
+  }
+  100% {
+    transform: scale(1);
+    border-color: var(--attemptOutline);
+  }
 }
