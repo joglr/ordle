@@ -8,8 +8,6 @@ import {
   INC,
   BoardState,
   writeLetter,
-  getBestLetterState,
-  LetterState,
 } from "./state";
 
 const almostFullHistory: History = [
@@ -144,36 +142,5 @@ describe("colorize", () => {
     expect(e).toStrictEqual(INC("A"));
   });
 
-  it("prefers correctly placed tiles over correct letters", () => {
-    const state = mkState([], "HELSE".split(""));
-    const newState = colorize(state, "HOLDE");
-    expect(newState.history[0]).toStrictEqual([
-      C("H"),
-      INC("E"),
-      C("L"),
-      INC("S"),
-      C("E"),
-    ]);
-  });
-
-  it.todo("updates keyboard colors correctly");
-});
-
-describe("getBestLetterState", () => {
-  it("prefers C over CL", () => {
-    expect(
-      getBestLetterState(LetterState.CORRECT, LetterState.CORRECT_LETTER)
-    ).toBe(LetterState.CORRECT);
-    expect(
-      getBestLetterState(LetterState.CORRECT_LETTER, LetterState.CORRECT)
-    ).toBe(LetterState.CORRECT);
-  });
-  it("prefers CL over INC", () => {
-    expect(
-      getBestLetterState(LetterState.CORRECT_LETTER, LetterState.INCORRECT)
-    ).toBe(LetterState.CORRECT_LETTER);
-    expect(
-      getBestLetterState(LetterState.INCORRECT, LetterState.CORRECT_LETTER)
-    ).toBe(LetterState.CORRECT_LETTER);
-  });
+  it.todo("updates keyboard colors");
 });
