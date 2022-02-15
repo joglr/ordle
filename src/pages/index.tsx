@@ -339,7 +339,7 @@ function KeyboardButton({
 
 function ShareButton() {
   const [state] = useOrdleContext();
-  const { addToast } = useToasts()
+  const { addToast } = useToasts();
 
   const stateToEmojiMap: Record<LetterState, string> = {
     [LetterState.CORRECT]: "🟩",
@@ -354,13 +354,17 @@ function ShareButton() {
     const result = state.board.history
       .map((line) => line.map((x) => stateToEmojiMap[x.state]).join(""))
       .join("\n");
-    if (navigator.canShare()) {
+    if (
+      navigator.canShare({
+        text: result,
+      })
+    ) {
       navigator.share({
         text: result,
       });
     } else {
       navigator.clipboard.writeText(result);
-      addToast("Resultat kopieret!", {})
+      addToast("Resultat kopieret!", {});
     }
   }
   return <Button onClick={share}>Del</Button>;
