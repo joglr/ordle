@@ -107,9 +107,7 @@ function App() {
               "Du gættede dagens ord!"
             )}
           </DialogContent>
-          {/* <DialogActions>
-            <Button>Del</Button>
-          </DialogActions> */}
+          {ordleState.gameState === GameState.WIN ? <WinActions /> : null}
         </Dialog>
       </div>
     </OrdleContext.Provider>
@@ -334,6 +332,45 @@ function KeyboardButton({
     >
       {text}
     </button>
+  );
+}
+
+function WinActions() {
+  const [state] = useOrdleContext();
+  const { addToast } = useToasts();
+
+  const stateToEmojiMap: Record<LetterState, string> = {
+    [LetterState.CORRECT]: "🟩",
+    [LetterState.CORRECT_LETTER]: "🟨",
+    [LetterState.INCORRECT]: "⬛",
+    [LetterState.DEFAULT]: "⬛",
+    [LetterState.ATTEMPT]: "⬛",
+    [LetterState.EMPTY]: "⬛",
+  };
+
+  function share(copy = false) {
+    const result = state.board.history
+      .map((line) => line.map((x) => stateToEmojiMap[x.state]).join(""))
+      .join("\n");
+    if (
+      navigator.canShare({
+        text: result,
+      }) &&
+      !copy
+    ) {
+      navigator.share({
+        text: result,
+      });
+    } else {
+      navigator.clipboard.writeText(result);
+      addToast("Resultat kopieret!", {});
+    }
+  }
+  return (
+    <DialogActions>
+      <Button onClick={() => share(true)}>Kopier resultat</Button>
+      <Button onClick={() => share()}>Del</Button>
+    </DialogActions>
   );
 }
 
