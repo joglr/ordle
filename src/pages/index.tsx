@@ -339,30 +339,19 @@ function WinActions() {
   const [state] = useOrdleContext();
   const { addToast } = useToasts();
 
-  const stateToEmojiMap: Record<LetterState, string> = {
-    [LetterState.CORRECT]: "🟩",
-    [LetterState.CORRECT_LETTER]: "🟨",
-    [LetterState.INCORRECT]: "⬛",
-    [LetterState.DEFAULT]: "⬛",
-    [LetterState.ATTEMPT]: "⬛",
-    [LetterState.EMPTY]: "⬛",
-  };
-
   function share(copy = false) {
-    const result = state.board.history
-      .map((line) => line.map((x) => stateToEmojiMap[x.state]).join(""))
-      .join("\n");
+    const { shareString } = state;
     if (
       navigator.canShare({
-        text: result,
+        text: shareString,
       }) &&
       !copy
     ) {
       navigator.share({
-        text: result,
+        text: shareString,
       });
     } else {
-      navigator.clipboard.writeText(result);
+      navigator.clipboard.writeText(shareString);
       addToast("Resultat kopieret!", {});
     }
   }

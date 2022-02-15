@@ -1,4 +1,5 @@
 import { clone } from "./util";
+import { getWordIndexFromTimeMS } from "./word";
 
 export interface OrdleState {
   board: BoardState;
@@ -83,6 +84,7 @@ export function createEmptyState(): OrdleState {
     responseText: null,
     gameState: GameState.PLAYING,
     todaysWord: null,
+    shareString: "",
   } as OrdleState;
   const letters = [...keyboard[0], ...keyboard[1], ...keyboard[2]];
   letters.forEach((letter) => {
@@ -147,6 +149,7 @@ export async function guess(os: OrdleState): Promise<OrdleState> {
       responseText: "Der kunne ikke oprettes forbindelse",
       board,
       todaysWord: null,
+      shareString: "",
     };
   }
 }
@@ -214,4 +217,20 @@ export function getBestLetterState(l1: LetterState, l2: LetterState) {
     return LetterState.INCORRECT;
   }
   return LetterState.DEFAULT;
+}
+
+export function generateShareString(history: History) {
+  const stateToEmojiMap: Record<LetterState, string> = {
+    [LetterState.CORRECT]: "🟩",
+    [LetterState.CORRECT_LETTER]: "🟨",
+    [LetterState.INCORRECT]: "⬛",
+    [LetterState.DEFAULT]: "⬛",
+    [LetterState.ATTEMPT]: "⬛",
+    [LetterState.EMPTY]: "⬛",
+  };
+  const result = history
+    .map((line) => line.map((x) => stateToEmojiMap[x.state]).join(""))
+    .join("\n");
+
+  return result;
 }

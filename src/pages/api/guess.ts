@@ -7,6 +7,7 @@ import {
   LetterState,
   GameState,
   HISTORY_SIZE,
+  generateShareString,
 } from "../../state";
 import { getTodaysWord, isWord } from "../../word";
 
@@ -50,12 +51,17 @@ export default function guess(req: VercelRequest, res: GuessResponse) {
       ? GameState.LOSE
       : GameState.PLAYING;
 
+    const shareString = GameState.WIN
+      ? generateShareString(newBoardState.history)
+      : "";
+
     return res.json({
       loadingState: LoadingState.SUCCESS,
       board: newBoardState,
       responseText: null,
       gameState,
-      ...(gameState === GameState.LOSE ? { todaysWord } : { todaysWord: null }),
+      shareString,
+      todaysWord: gameState === GameState.LOSE ? todaysWord : null,
     });
   } catch (e) {
     return res.json({
@@ -64,6 +70,7 @@ export default function guess(req: VercelRequest, res: GuessResponse) {
       responseText: "Intern fejl",
       board: createEmptyState().board,
       todaysWord: null,
+      shareString: "",
     });
   }
 }
