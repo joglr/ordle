@@ -6,6 +6,7 @@ export interface OrdleState {
   gameState: GameState;
   responseText: string | null;
   todaysWord: string | null;
+  shareString: string;
 }
 
 export enum LoadingState {
