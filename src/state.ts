@@ -233,6 +233,7 @@ export function generateShareString(history: History) {
     .join("\n");
 
   const ordleNum = getWordIndexFromTimeMS(new Date().getTime()) + 1;
+  const attempts = history.length;
 
-  return [`ordle.app #${ordleNum}`, result].join("\n");
+  return [`Ordle #${ordleNum} ${attempts}/${HISTORY_SIZE}`, result].join("\n");
 }
