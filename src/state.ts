@@ -232,5 +232,7 @@ export function generateShareString(history: History) {
     .map((line) => line.map((x) => stateToEmojiMap[x.state]).join(""))
     .join("\n");
 
-  return result;
+  const ordleNum = getWordIndexFromTimeMS(new Date().getTime()) + 1;
+
+  return [`ordle.app #${ordleNum}`, result].join("\n");
 }
