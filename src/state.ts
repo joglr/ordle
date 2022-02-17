@@ -66,10 +66,11 @@ export const L = (l: string, s: LetterState) => ({
 
 export const DF = (l: string) => L(l.toUpperCase(), LetterState.DEFAULT);
 
-export const C = (l: string) => L(l.toUpperCase(), LetterState.CORRECT);
-export const INC = (l: string) => L(l.toUpperCase(), LetterState.INCORRECT);
+export const GREEN = (l: string) => L(l.toUpperCase(), LetterState.CORRECT);
+export const GREY = (l: string) => L(l.toUpperCase(), LetterState.INCORRECT);
 
-export const CL = (l: string) => L(l.toUpperCase(), LetterState.CORRECT_LETTER);
+export const YELLOW = (l: string) =>
+  L(l.toUpperCase(), LetterState.CORRECT_LETTER);
 
 export function createEmptyState(): OrdleState {
   const state = {
@@ -156,33 +157,35 @@ export function colorize(os: BoardState, todaysWord: string): BoardState {
     | string
     | null
   )[];
-  const historyEntry = currentAttempt.map((l) => INC(l)) as HistoryEntry;
+  const historyEntry = currentAttempt.map((l) => GREY(l)) as HistoryEntry;
+  const currentAttemptTemp = [...currentAttempt] as (string | null)[];
 
   // Check correct letters
-  for (let i = 0; i < currentAttempt.length; i++) {
-    const letter = currentAttempt[i];
+  for (let i = 0; i < currentAttemptTemp.length; i++) {
+    const letter = currentAttemptTemp[i];
     const todaysLetter = todaysLetters[i];
 
     if (todaysLetter === null) continue;
+    if (letter === null) continue;
 
     if (letter === todaysLetter) {
+      currentAttemptTemp[i] = null;
       todaysLetters[i] = null;
-      historyEntry[i] = C(letter);
+      historyEntry[i] = GREEN(letter);
     }
   }
 
   // Check correct letter, wrong spot
-  for (let i = 0; i < currentAttempt.length; i++) {
-    const letter = currentAttempt[i];
-    const todaysLetter = todaysLetters[i];
+  for (let i = 0; i < currentAttemptTemp.length; i++) {
+    const letter = currentAttemptTemp[i];
 
     if (letter === null) continue;
-    if (todaysLetter === null) continue;
 
     if (todaysLetters.includes(letter)) {
       const index = todaysLetters.indexOf(letter);
       todaysLetters[index] = null;
-      historyEntry[i] = CL(letter);
+      currentAttemptTemp[i] = null;
+      historyEntry[i] = YELLOW(letter);
     }
   }
 

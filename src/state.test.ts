@@ -1,11 +1,10 @@
 import {
-  C,
-  CL,
+  GREEN,
+  YELLOW,
   colorize,
   deleteLetter,
-  DF,
   History,
-  INC,
+  GREY,
   BoardState,
   writeLetter,
   getBestLetterState,
@@ -13,20 +12,20 @@ import {
 } from "./state";
 
 const almostFullHistory: History = [
-  [C("A"), C("B"), C("C"), C("D"), C("E")],
-  [C("A"), C("B"), C("C"), C("D"), C("E")],
-  [C("A"), C("B"), C("C"), C("D"), C("E")],
-  [C("A"), C("B"), C("C"), C("D"), C("E")],
-  [C("A"), C("B"), C("C"), C("D"), C("E")],
+  [GREEN("A"), GREEN("B"), GREEN("C"), GREEN("D"), GREEN("E")],
+  [GREEN("A"), GREEN("B"), GREEN("C"), GREEN("D"), GREEN("E")],
+  [GREEN("A"), GREEN("B"), GREEN("C"), GREEN("D"), GREEN("E")],
+  [GREEN("A"), GREEN("B"), GREEN("C"), GREEN("D"), GREEN("E")],
+  [GREEN("A"), GREEN("B"), GREEN("C"), GREEN("D"), GREEN("E")],
 ];
 
 const fullHistory: History = [
-  [C("A"), C("B"), C("C"), C("D"), C("E")],
-  [C("A"), C("B"), C("C"), C("D"), C("E")],
-  [C("A"), C("B"), C("C"), C("D"), C("E")],
-  [C("A"), C("B"), C("C"), C("D"), C("E")],
-  [C("A"), C("B"), C("C"), C("D"), C("E")],
-  [C("A"), C("B"), C("C"), C("D"), C("E")],
+  [GREEN("A"), GREEN("B"), GREEN("C"), GREEN("D"), GREEN("E")],
+  [GREEN("A"), GREEN("B"), GREEN("C"), GREEN("D"), GREEN("E")],
+  [GREEN("A"), GREEN("B"), GREEN("C"), GREEN("D"), GREEN("E")],
+  [GREEN("A"), GREEN("B"), GREEN("C"), GREEN("D"), GREEN("E")],
+  [GREEN("A"), GREEN("B"), GREEN("C"), GREEN("D"), GREEN("E")],
+  [GREEN("A"), GREEN("B"), GREEN("C"), GREEN("D"), GREEN("E")],
 ];
 
 const fullAttempt = ["A", "B", "C", "D", "E"];
@@ -114,7 +113,7 @@ describe("colorize", () => {
     const state = mkState([], ["A", "B", "C", "D", "E"]);
     const newState = colorize(state, "abcde");
     for (const letter of newState.history[0]) {
-      expect(letter).toStrictEqual(C(letter.letter));
+      expect(letter).toStrictEqual(GREEN(letter.letter));
     }
   });
 
@@ -122,37 +121,49 @@ describe("colorize", () => {
     const state = mkState([], "FAAAA".split(""));
     const newState = colorize(state, "ABCDE");
 
-    const [a, b, c, d, e] = newState.history[0];
-
-    expect(a).toStrictEqual(INC("F"));
-    expect(b).toStrictEqual(CL("A"));
-    expect(c).toStrictEqual(INC("A"));
-    expect(d).toStrictEqual(INC("A"));
-    expect(e).toStrictEqual(INC("A"));
+    expect(newState.history[0]).toStrictEqual([
+      GREY("F"),
+      YELLOW("A"),
+      GREY("A"),
+      GREY("A"),
+      GREY("A"),
+    ]);
   });
 
   it("only colorize the first match if multiple", () => {
     const state = mkState([], "FAAAA".split(""));
     const newState = colorize(state, "AACDE");
 
-    const [a, b, c, d, e] = newState.history[0];
-
-    expect(a).toStrictEqual(INC("F"));
-    expect(b).toStrictEqual(C("A"));
-    expect(c).toStrictEqual(CL("A"));
-    expect(d).toStrictEqual(INC("A"));
-    expect(e).toStrictEqual(INC("A"));
+    expect(newState.history[0]).toStrictEqual([
+      GREY("F"),
+      GREEN("A"),
+      YELLOW("A"),
+      GREY("A"),
+      GREY("A"),
+    ]);
   });
 
   it("prefers correctly placed tiles over correct letters", () => {
     const state = mkState([], "HELSE".split(""));
     const newState = colorize(state, "HOLDE");
     expect(newState.history[0]).toStrictEqual([
-      C("H"),
-      INC("E"),
-      C("L"),
-      INC("S"),
-      C("E"),
+      GREEN("H"),
+      GREY("E"),
+      GREEN("L"),
+      GREY("S"),
+      GREEN("E"),
+    ]);
+  });
+
+  it("", () => {
+    const state = mkState([], "DRIVE".split(""));
+    const newState = colorize(state, "INDRE");
+    expect(newState.history[0]).toStrictEqual([
+      YELLOW("D"),
+      YELLOW("R"),
+      YELLOW("I"),
+      GREY("V"),
+      GREEN("E"),
     ]);
   });
 
