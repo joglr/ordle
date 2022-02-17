@@ -1,7 +1,7 @@
 import WORDS from "../words.json";
 
 const NOW_MS = new Date().getTime();
-const getWordIndexFromTimeMS = (timeMS: number) => {
+export const getWordIndexFromTimeMS = (timeMS: number) => {
   return Math.floor((timeMS - START_TIME_MS) / ONE_DAY_IN_MS) % WORDS.length;
 };
 
