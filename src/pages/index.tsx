@@ -63,6 +63,7 @@ const Home: NextPage = () => {
           name="description"
           content="Ordle - Ordspil inspireret af Wordle"
         />
+        <meta name="theme-color" content="#121212" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <App />
@@ -92,7 +93,7 @@ function App() {
             }}
           >
             {ordleState.gameState === GameState.LOSE
-              ? "Spil med igen i morgen!"
+              ? "Spil med igen i morgen, der er et nyt ord hver dag!"
               : "Du gættede dagens ord!"}
           </DialogContent>
           <GameOverActions />
