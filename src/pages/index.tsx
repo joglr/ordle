@@ -358,7 +358,7 @@ function WinActions() {
   }
   return (
     <DialogActions>
-      <Button onClick={() => share(true)}>Kopier resultat</Button>
+      <Button onClick={() => share(true)}>Kopier</Button>
       <Button onClick={() => share()}>Del</Button>
     </DialogActions>
   );
