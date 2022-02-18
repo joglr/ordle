@@ -342,6 +342,7 @@ function WinActions() {
   function share(copy = false) {
     const { shareString } = state;
     if (
+      "canShare" in navigator &&
       navigator.canShare({
         text: shareString,
       }) &&
