@@ -18,11 +18,18 @@ type GuessResponse = Omit<VercelResponse, "json"> & {
 const todaysWord = getTodaysWord();
 
 export default function guess(req: VercelRequest, res: GuessResponse) {
+  function logAndRespond(state: OrdleState) {
+    console.log(state);
+    return res.json(state);
+  }
+
   try {
     const state = req.body as OrdleState;
 
+    let response: OrdleState = createEmptyState();
+
     if (state === undefined) {
-      return res.json({
+      return logAndRespond({
         ...createEmptyState(),
         loadingState: LoadingState.ERROR,
         responseText: "Intern fejl",
@@ -34,13 +41,14 @@ export default function guess(req: VercelRequest, res: GuessResponse) {
 
     const wordIsWord = isWord(wordLowercase);
 
-    if (!wordIsWord)
-      return res.json({
+    if (!wordIsWord) {
+      return logAndRespond({
         ...state,
         loadingState: LoadingState.ERROR,
         responseText: `${word} er ikke et gyldigt ord`,
         board: state.board,
       });
+    }
 
     const newBoardState = colorize(state.board, todaysWord);
     const gameState = newBoardState.history.some((historyEntry) =>
@@ -55,7 +63,7 @@ export default function guess(req: VercelRequest, res: GuessResponse) {
       ? generateShareString(newBoardState.history)
       : "";
 
-    return res.json({
+    return logAndRespond({
       loadingState: LoadingState.SUCCESS,
       board: newBoardState,
       responseText: null,
@@ -64,7 +72,7 @@ export default function guess(req: VercelRequest, res: GuessResponse) {
       todaysWord: gameState === GameState.LOSE ? todaysWord : null,
     });
   } catch (e) {
-    return res.json({
+    return logAndRespond({
       gameState: GameState.PLAYING,
       loadingState: LoadingState.ERROR,
       responseText: "Intern fejl",
