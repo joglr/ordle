@@ -5,7 +5,6 @@ import { OrdleState, History, keyboard, GameState } from "../state";
 import Head from "next/head";
 import { createContext, SetStateAction, useContext } from "react";
 import { useState } from "react";
-import { ToastProvider, useToasts } from "react-toast-notifications";
 import Confetti from "react-confetti";
 import { useBoolean, useWindowSize } from "react-use";
 import {
@@ -57,7 +56,7 @@ function useOrdleContext() {
 
 const Home: NextPage = () => {
   return (
-    <ToastProvider>
+    <>
       <Head>
         <title>Ordle</title>
         <meta
@@ -67,7 +66,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <App />
-    </ToastProvider>
+    </>
   );
 };
 
@@ -219,7 +218,12 @@ function Keyboard() {
   return (
     <div className={styles.keyboard}>
       {keyboard.map((row, index) => (
-        <KeyboardRow key={index} row={row} final={isLast(keyboard, index)} />
+        <KeyboardRow
+          key={index}
+          row={row}
+          final={isLast(keyboard, index)}
+          setToast={setToast}
+        />
       ))}
       <Snackbar
         anchorOrigin={{ horizontal: "center", vertical: "top" }}
@@ -233,10 +237,13 @@ function Keyboard() {
   );
 }
 
-function KeyboardRow(props: { row: string[]; final?: boolean }) {
+function KeyboardRow(props: {
+  row: string[];
+  final?: boolean;
+  setToast: (message: string | null) => void;
+}) {
   const [ordleState, setOrdleState] = useOrdleContext();
   const { board, loadingState } = ordleState;
-  const { addToast } = useToasts();
 
   async function enterHandler() {
     if (loadingState === LoadingState.LOADING) return;
@@ -247,10 +254,7 @@ function KeyboardRow(props: { row: string[]; final?: boolean }) {
     }));
     const response = await guess(ordleState);
     if (response.loadingState === "ERROR") {
-      addToast(response.responseText, {
-        appearance: "error",
-        autoDismiss: true,
-      });
+      props.setToast(response.responseText);
     }
     setOrdleState(response);
   }
