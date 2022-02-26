@@ -8,6 +8,7 @@ import {
   GameState,
   HISTORY_SIZE,
   generateShareString,
+  stateToEmojiMap,
 } from "../../state";
 import { getTodaysWord, isWord } from "../../word";
 
@@ -15,18 +16,45 @@ type GuessResponse = Omit<VercelResponse, "json"> & {
   json: (arg0: OrdleState) => VercelResponse;
 };
 
+const ips: Record<string, string> = JSON.parse(process.env.KNOWN_IPS || "{}");
+
 const todaysWord = getTodaysWord();
 
 export default function guess(req: VercelRequest, res: GuessResponse) {
   function logAndRespond(state: OrdleState) {
-    console.log(state);
+    const {
+      board: { history },
+      gameState,
+      shareString,
+    } = state;
+
+    const ip = req.headers["x-real-ip"] as string;
+
+    console.log(
+      `
+IP: ${ip} (${(ip ? ips[ip] : undefined) ?? "Unknown"})
+Location: ${req.headers["x-vercel-ip-city"]} (${
+        req.headers["x-Vercel-ip-country"]
+      })
+Status: ${gameState}
+Share string: ${shareString}
+History:
+${history
+  .map((historyEntry) => {
+    const attemptWord = historyEntry.map((ls) => ls.letter).join("");
+    const attemptResult = historyEntry
+      .map((ls) => ls.state)
+      .map((s) => stateToEmojiMap[s])
+      .join("");
+    return `${attemptWord} ${attemptResult}`;
+  })
+  .join("\n")}`
+    );
     return res.json(state);
   }
 
   try {
     const state = req.body as OrdleState;
-
-    let response: OrdleState = createEmptyState();
 
     if (state === undefined) {
       return logAndRespond({

@@ -94,7 +94,10 @@ export function createEmptyState(): OrdleState {
   return state;
 }
 
-export function getColorFromLetterEntryState(styles: any, state: LetterState) {
+export function getColorFromLetterEntryState(
+  styles: { correct: string; correctSpot: string },
+  state: LetterState
+) {
   switch (state) {
     case LetterState.CORRECT:
       return styles.correct;
@@ -222,15 +225,15 @@ export function getBestLetterState(l1: LetterState, l2: LetterState) {
   return LetterState.DEFAULT;
 }
 
+export const stateToEmojiMap: Record<LetterState, string> = {
+  [LetterState.CORRECT]: "🟩",
+  [LetterState.CORRECT_LETTER]: "🟨",
+  [LetterState.INCORRECT]: "⬛",
+  [LetterState.DEFAULT]: "⬛",
+  [LetterState.ATTEMPT]: "⬛",
+  [LetterState.EMPTY]: "⬛",
+};
 export function generateShareString(history: History) {
-  const stateToEmojiMap: Record<LetterState, string> = {
-    [LetterState.CORRECT]: "🟩",
-    [LetterState.CORRECT_LETTER]: "🟨",
-    [LetterState.INCORRECT]: "⬛",
-    [LetterState.DEFAULT]: "⬛",
-    [LetterState.ATTEMPT]: "⬛",
-    [LetterState.EMPTY]: "⬛",
-  };
   const result = history
     .map((line) => line.map((x) => stateToEmojiMap[x.state]).join(""))
     .join("\n");
