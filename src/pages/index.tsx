@@ -7,7 +7,7 @@ import { createContext, SetStateAction, useContext } from "react";
 import { useState } from "react";
 import { ToastProvider, useToasts } from "react-toast-notifications";
 import Confetti from "react-confetti";
-import { useWindowSize } from "react-use";
+import { useBoolean, useWindowSize } from "react-use";
 import {
   LetterState,
   LoadingState,
@@ -21,11 +21,13 @@ import {
 import styles from "../styles/Home.module.css";
 import { isLast } from "../util";
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  Snackbar,
 } from "@mui/material";
 
 function getClassNameFromLetterEntryState(state: LetterState) {
@@ -172,7 +174,7 @@ function Square(props: { children: string; className: string }) {
 function Keyboard() {
   const [os, setOrdleState] = useOrdleContext();
   const { loadingState, board } = os;
-  const { addToast } = useToasts();
+  const [toastMessage, setToast] = useState<string | null>(null);
 
   async function keyupHandler(e: KeyboardEvent) {
     const attemptsRemaining = getRemainingAttempts(board.history);
@@ -205,10 +207,7 @@ function Keyboard() {
     if (e.key === "Enter" && !guessKeyDisabled) {
       const response = await guess(os);
       if (response.loadingState === "ERROR") {
-        addToast(response.responseText, {
-          appearance: "error",
-          autoDismiss: true,
-        });
+        setToast(response.responseText);
       }
       setOrdleState(response);
     }
@@ -222,6 +221,14 @@ function Keyboard() {
       {keyboard.map((row, index) => (
         <KeyboardRow key={index} row={row} final={isLast(keyboard, index)} />
       ))}
+      <Snackbar
+        anchorOrigin={{ horizontal: "center", vertical: "top" }}
+        open={Boolean(toastMessage)}
+        autoHideDuration={3000}
+        onClose={() => setToast(null)}
+      >
+        <Alert severity="error">{toastMessage}</Alert>
+      </Snackbar>
     </div>
   );
 }
@@ -329,11 +336,10 @@ function KeyboardButton({
 }
 
 function GameOverActions() {
-  const [state] = useOrdleContext();
-  const { addToast } = useToasts();
+  const [{ shareString }] = useOrdleContext();
+  const [toastOpen, setToastOpen] = useBoolean(false);
 
   function share(copy = false) {
-    const { shareString } = state;
     if (
       "canShare" in navigator &&
       navigator.canShare({
@@ -346,13 +352,21 @@ function GameOverActions() {
       });
     } else {
       navigator.clipboard.writeText(shareString);
-      addToast("Resultat kopieret!", {});
+      setToastOpen(true);
     }
   }
   return (
     <DialogActions>
       <Button onClick={() => share(true)}>Kopier resultat</Button>
       <Button onClick={() => share()}>Del</Button>
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={3000}
+        onClose={setToastOpen}
+        anchorOrigin={{ horizontal: "center", vertical: "top" }}
+      >
+        <Alert severity="success">Resultat kopieret!</Alert>
+      </Snackbar>
     </DialogActions>
   );
 }
