@@ -82,9 +82,7 @@ function App() {
         <Keyboard />
         <Dialog open={ordleState.gameState !== GameState.PLAYING}>
           <DialogTitle>
-            {ordleState.gameState === GameState.LOSE
-              ? "Desværre!"
-              : "Tillykke!"}
+            {ordleState.gameState === GameState.LOSE ? "Desværre" : "Tillykke"}
           </DialogTitle>
           <DialogContent
             style={{
@@ -92,22 +90,11 @@ function App() {
               maxWidth: "300px",
             }}
           >
-            {ordleState.gameState === GameState.LOSE ? (
-              <>
-                Dagens ord var..
-                <p
-                  style={{
-                    textAlign: "center",
-                  }}
-                >
-                  <b>{ordleState.todaysWord?.toUpperCase()}</b>
-                </p>
-              </>
-            ) : (
-              "Du gættede dagens ord!"
-            )}
+            {ordleState.gameState === GameState.LOSE
+              ? "Spil med igen i morgen!"
+              : "Du gættede dagens ord!"}
           </DialogContent>
-          {ordleState.gameState === GameState.WIN ? <WinActions /> : null}
+          <GameOverActions />
         </Dialog>
       </div>
     </OrdleContext.Provider>
@@ -126,7 +113,10 @@ function Display() {
   const currentAttemptRemainingSquares = [];
   for (let i = 0; i < (attemptsRemaining - 1) * WORD_SIZE; i++) {
     attemptsRemainingSquares.push(
-      <Square className={getClassNameFromLetterEntryState(LetterState.EMPTY)}>
+      <Square
+        key={i}
+        className={getClassNameFromLetterEntryState(LetterState.EMPTY)}
+      >
         {" "}
       </Square>
     );
@@ -135,7 +125,10 @@ function Display() {
   if (attemptsRemaining > 0) {
     for (let i = 0; i < currentLettersRemaining; i++) {
       currentAttemptRemainingSquares.push(
-        <Square className={getClassNameFromLetterEntryState(LetterState.EMPTY)}>
+        <Square
+          key={i}
+          className={getClassNameFromLetterEntryState(LetterState.EMPTY)}
+        >
           {" "}
         </Square>
       );
@@ -335,7 +328,7 @@ function KeyboardButton({
   );
 }
 
-function WinActions() {
+function GameOverActions() {
   const [state] = useOrdleContext();
   const { addToast } = useToasts();
 
@@ -358,7 +351,7 @@ function WinActions() {
   }
   return (
     <DialogActions>
-      <Button onClick={() => share(true)}>Kopier</Button>
+      <Button onClick={() => share(true)}>Kopier resultat</Button>
       <Button onClick={() => share()}>Del</Button>
     </DialogActions>
   );
