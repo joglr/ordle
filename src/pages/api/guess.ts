@@ -34,7 +34,7 @@ export default function guess(req: VercelRequest, res: GuessResponse) {
       `
 IP: ${ip} (${(ip ? ips[ip] : undefined) ?? "Unknown"})
 Location: ${req.headers["x-vercel-ip-city"]} (${
-        req.headers["x-Vercel-ip-country"]
+        req.headers["x-vercel-ip-country"]
       })
 Status: ${gameState}
 Share string: ${shareString}
