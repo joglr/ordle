@@ -11,6 +11,9 @@ import {
   stateToEmojiMap,
 } from "../../state";
 import { getTodaysWord, isWord } from "../../word";
+import createLogger from "pino";
+
+const logger = createLogger();
 
 type GuessResponse = Omit<VercelResponse, "json"> & {
   json: (arg0: OrdleState) => VercelResponse;
@@ -30,26 +33,20 @@ export default function guess(req: VercelRequest, res: GuessResponse) {
 
     const ip = req.headers["x-real-ip"] as string;
 
-    console.log(
-      `
-IP: ${ip} (${(ip ? ips[ip] : undefined) ?? "Unknown"})
-Location: ${req.headers["x-vercel-ip-city"]} (${
-        req.headers["x-vercel-ip-country"]
-      })
-Status: ${gameState}
-Share string: ${shareString}
-History:
-${history
-  .map((historyEntry) => {
-    const attemptWord = historyEntry.map((ls) => ls.letter).join("");
-    const attemptResult = historyEntry
-      .map((ls) => ls.state)
-      .map((s) => stateToEmojiMap[s])
-      .join("");
-    return `${attemptWord} ${attemptResult}`;
-  })
-  .join("\n")}`
-    );
+    logger.info({
+      IP: `${ip} (${(ip ? ips[ip] : undefined) ?? "Unknown"})`,
+      Location: `${req.headers["x-vercel-ip-city"]} (${req.headers["x-vercel-ip-country"]})`,
+      Status: gameState,
+      Share_string: shareString,
+      History: history.map((historyEntry) => {
+        const attemptWord = historyEntry.map((ls) => ls.letter).join("");
+        const attemptResult = historyEntry
+          .map((ls) => ls.state)
+          .map((s) => stateToEmojiMap[s])
+          .join("");
+        return `${attemptWord} ${attemptResult}`;
+      }),
+    });
     return res.json(state);
   }
 
