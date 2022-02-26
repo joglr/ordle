@@ -1,8 +1,8 @@
 import { CacheProvider, EmotionCache } from "@emotion/react";
-import { ThemeProvider, CssBaseline } from "@mui/material";
+import { ThemeProvider, CssBaseline, useMediaQuery } from "@mui/material";
 
 import createEmotionCache from "../utility/create-emotion-cache";
-import { darkTheme } from "../styles/theme/themes";
+import { darkTheme, lightTheme } from "../styles/theme/themes";
 import "../styles/globals.css";
 import { AppProps } from "next/app";
 
@@ -13,9 +13,10 @@ function MyApp({
   emotionCache = clientSideEmotionCache,
   pageProps,
 }: AppProps & { emotionCache?: EmotionCache }) {
+  const prefersLight = useMediaQuery("(prefers-color-scheme: light)");
   return (
     <CacheProvider value={emotionCache}>
-      <ThemeProvider theme={darkTheme}>
+      <ThemeProvider theme={prefersLight ? lightTheme : darkTheme}>
         <CssBaseline />
         <Component {...pageProps} />
       </ThemeProvider>
