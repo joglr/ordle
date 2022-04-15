@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { NextPage } from "next";
-import { Dispatch, HTMLAttributes, useEffect } from "react";
+import { Dispatch, HTMLAttributes, useEffect, useRef } from "react";
 import { OrdleState, History, keyboard, GameState } from "../state";
 import Head from "next/head";
 import { createContext, SetStateAction, useContext } from "react";
@@ -63,6 +63,7 @@ const Home: NextPage = () => {
           name="description"
           content="Ordle - Ordspil inspireret af Wordle"
         />
+        <meta name="theme-color" content="#121212" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <App />
@@ -72,10 +73,58 @@ const Home: NextPage = () => {
 
 function App() {
   const [ordleState, setOrdleState] = useState<OrdleState>(createEmptyState);
+  const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
+  const [showInstallPrompt, setShowInstallPrompt] = useBoolean(false);
   const props = useWindowSize();
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (evt) => {
+      // Prevent the mini-infobar from appearing on mobile
+      evt.preventDefault();
+      // Stash the event so it can be triggered later.
+      deferredPromptRef.current = evt;
+      setShowInstallPrompt(true);
+    })
+  })
+
+  async function install() {
+
+    if (!deferredPromptRef.current) {
+      return;
+    }
+
+    // Show the install prompt
+    deferredPromptRef.current.prompt();
+
+    // Wait for the user to respond to the prompt
+    await deferredPromptRef.current.userChoice;
+    deferredPromptRef.current = null
+    setShowInstallPrompt(false);
+  }
 
   return (
     <OrdleContext.Provider value={[ordleState, setOrdleState]}>
+      <Snackbar
+        open={showInstallPrompt}
+        onClose={setShowInstallPrompt}
+        anchorOrigin={{ horizontal: "center", vertical: "top" }}
+      >
+        <Alert
+          severity="info"
+          action={
+            <>
+              <Button
+                color="inherit"
+                size="small"
+                onClick={install}>Installer</Button>
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => setShowInstallPrompt(false)}>Luk</Button>
+            </>
+          }>
+          Installer Ordle som en app
+        </Alert>
+      </Snackbar>
       {ordleState.gameState === GameState.WIN ? <Confetti {...props} /> : null}
       <div className={styles.container}>
         <h1 className={styles.title}>Ordle</h1>
@@ -92,7 +141,7 @@ function App() {
             }}
           >
             {ordleState.gameState === GameState.LOSE
-              ? "Spil med igen i morgen!"
+              ? "Spil med igen i morgen, der er et nyt ord hver dag!"
               : "Du gættede dagens ord!"}
           </DialogContent>
           <GameOverActions />

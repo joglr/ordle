@@ -1,0 +1,52 @@
+{
+  "name": "Ordle.app",
+  "short_name": "Ordle",
+  "icons": [
+    {
+      "src": "/icons/ordle_1024x1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/ordle_64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/ordle_128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/ordle_256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/ordle_384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/ordle_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/ordle_768x768.png",
+      "sizes": "768x768",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/ordle_maskable_192x192.png",
+      "sizes": "768x768",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "theme_color": "#4cae4c",
+  "background_color": "#b3b3b3",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
+}
