@@ -28,6 +28,7 @@ import {
   DialogTitle,
   Snackbar,
 } from "@mui/material";
+import { useUpdateAvailable } from "../hooks";
 
 function getClassNameFromLetterEntryState(state: LetterState) {
   switch (state) {
@@ -75,7 +76,11 @@ function App() {
   const [ordleState, setOrdleState] = useState<OrdleState>(createEmptyState);
   const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useBoolean(false);
+  const [showUpdatePrompt, setShowUpdatePrompt] = useBoolean(false);
   const props = useWindowSize();
+
+  useUpdateAvailable(() => setShowUpdatePrompt(true));
+
   useEffect(() => {
     window.addEventListener('beforeinstallprompt', (evt) => {
       // Prevent the mini-infobar from appearing on mobile
@@ -87,7 +92,6 @@ function App() {
   })
 
   async function install() {
-
     if (!deferredPromptRef.current) {
       return;
     }
@@ -123,6 +127,28 @@ function App() {
             </>
           }>
           Installer Ordle som en app
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={showUpdatePrompt}
+        onClose={setShowUpdatePrompt}
+        anchorOrigin={{ horizontal: "center", vertical: "top" }}
+      >
+        <Alert
+          severity="info"
+          action={
+            <>
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => window.location.reload()}>Opdater</Button>
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => setShowUpdatePrompt(false)}>Luk</Button>
+            </>
+          }>
+          Ny version tilgængelig
         </Alert>
       </Snackbar>
       {ordleState.gameState === GameState.WIN ? <Confetti {...props} /> : null}
