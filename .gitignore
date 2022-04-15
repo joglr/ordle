@@ -38,3 +38,5 @@ yarn-error.log*
 
 .react-bratus
 .eslintcache
+public/sw.js
+public/workbox-*.js

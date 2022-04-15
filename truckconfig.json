@@ -1,0 +1,6 @@
+{
+  "hiddenFiles": [
+    "ordle/yarn.lock",
+    "ordle/words.json"
+  ]
+}

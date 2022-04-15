@@ -7,8 +7,6 @@ import fs from "fs/promises";
 let words: string[] = [];
 
 if (process.env.WORDS) {
-  const url = new URL(process.env.WORDS);
-  url.searchParams.set("t", new Date().getTime().toString());
   words = JSON.parse(await fs.readFile("./words.json", "utf8"));
 }
 
