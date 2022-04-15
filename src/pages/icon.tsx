@@ -18,8 +18,8 @@ export default function Icon() {
   }
 
   const green = useMemo(() => {
-    if (typeof document === undefined) return "green"
-    return global.getComputedStyle(document.documentElement).getPropertyValue('--lightGreen')
+    if (global.document === undefined || global.document.documentElement === undefined) return "green"
+    return global.getComputedStyle(global.document.documentElement).getPropertyValue('--lightGreen')
   }, []);
 
   return (
