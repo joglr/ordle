@@ -122,7 +122,7 @@ function App() {
                 onClick={() => setShowInstallPrompt(false)}>Luk</Button>
             </>
           }>
-          Vil du installere Ordle som en app?
+          Installer Ordle som en app
         </Alert>
       </Snackbar>
       {ordleState.gameState === GameState.WIN ? <Confetti {...props} /> : null}
